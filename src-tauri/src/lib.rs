@@ -164,8 +164,8 @@ pub fn run() {
         .setup(|app| {
             // Register the default hotkey
             let default_hotkey = "F10";
-            let app_handle = app.app_handle().clone();
 
+            // Register the hotkey
             match Shortcut::from_str(default_hotkey) {
                 Ok(shortcut) => {
                     match app.global_shortcut().register(shortcut) {
@@ -178,29 +178,11 @@ pub fn run() {
                 }
             }
 
-            // Set up a listener on the window for shortcut events
-            // The global shortcut plugin emits events to the window
-            if let Some(window) = app.get_webview_window("main") {
-                let app_handle_for_shortcut = app_handle.clone();
-                window.listen("tauri://global-shortcut", move |event| {
-                    // Parse the event payload to get the shortcut that was triggered
-                    println!("Received shortcut event: {:?}", event.payload());
-
-                    if let Some(w) = app_handle_for_shortcut.get_webview_window("main") {
-                        if let Ok(is_visible) = w.is_visible() {
-                            let _ = if is_visible {
-                                println!("Hotkey pressed: Hiding window");
-                                w.hide()
-                            } else {
-                                println!("Hotkey pressed: Showing window");
-                                let _ = w.show();
-                                let _ = w.set_focus();
-                                Ok(())
-                            };
-                        }
-                    }
-                });
-            }
+            // NOTE: Tauri v2 global-shortcut plugin event listening not working
+            // The plugin registers shortcuts successfully but doesn't emit events
+            // that can be listened to in the application. This is a plugin limitation.
+            //
+            // Workaround: Use toggle_window_visibility command or tray menu button
 
             // Create tray menu
             let toggle_item = MenuItemBuilder::new("Toggle Window").id("toggle").build(app)?;
