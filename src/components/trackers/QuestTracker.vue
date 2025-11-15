@@ -113,20 +113,30 @@ const toggleQuestCompletion = (questId: string) => {
 
         <div v-if="selectedQuest.objectives.length > 0" class="detail-objectives">
           <strong>Objectives:</strong>
-          <ul>
-            <li v-for="(objective, idx) in selectedQuest.objectives" :key="idx">
-              {{ getLocalizedText(objective) }}
-            </li>
-          </ul>
+          <div class="objectives-list">
+            <div
+              v-for="(objective, idx) in selectedQuest.objectives"
+              :key="idx"
+              class="objective-item"
+            >
+              <span class="objective-number">{{ idx + 1 }}</span>
+              <span class="objective-text">{{ getLocalizedText(objective) }}</span>
+            </div>
+          </div>
         </div>
 
         <div v-if="selectedQuest.rewardItemIds.length > 0" class="detail-rewards">
           <strong>Rewards:</strong>
-          <ul>
-            <li v-for="(reward, idx) in selectedQuest.rewardItemIds" :key="idx">
-              {{ reward.itemId }} × {{ reward.quantity }}
-            </li>
-          </ul>
+          <div class="rewards-list">
+            <div
+              v-for="(reward, idx) in selectedQuest.rewardItemIds"
+              :key="idx"
+              class="reward-item"
+            >
+              <span class="reward-name">{{ reward.itemId }}</span>
+              <span class="reward-qty">×{{ reward.quantity }}</span>
+            </div>
+          </div>
         </div>
 
         <div v-if="selectedQuest.xp > 0" class="detail-xp">
@@ -312,6 +322,45 @@ const toggleQuestCompletion = (questId: string) => {
 .detail-xp strong {
   color: var(--color-text-secondary);
   font-weight: 500;
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.detail-trader {
+  padding: 8px;
+  background: var(--color-bg-secondary);
+  border-radius: 2px;
+}
+
+.rewards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reward-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  background: var(--color-bg-secondary);
+  border-left: 2px solid var(--color-accent);
+  border-radius: 2px;
+  font-size: 11px;
+}
+
+.reward-name {
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.reward-qty {
+  color: var(--color-accent);
+  font-weight: 600;
+  margin-left: 8px;
 }
 
 .detail-objectives {
@@ -323,7 +372,47 @@ const toggleQuestCompletion = (questId: string) => {
   color: var(--color-text-secondary);
   font-weight: 500;
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.objectives-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.objective-item {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--color-bg-secondary);
+  border-left: 2px solid var(--color-accent);
+  border-radius: 2px;
+}
+
+.objective-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  background: var(--color-accent);
+  color: var(--color-bg-primary);
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.objective-text {
+  flex: 1;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
 }
 
 .detail-objectives ul,
