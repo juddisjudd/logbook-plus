@@ -25,4 +25,8 @@ dist-ssr
 
 inspiration
 
-.claude
+.claude/*
+
+PLAN.md
+STANDARDS.md
+AESTHETICS-GUIDE.md
