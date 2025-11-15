@@ -3,6 +3,7 @@ import { ref } from "vue";
 import QuestTracker from "./trackers/QuestTracker.vue";
 import HideoutTracker from "./trackers/HideoutTracker.vue";
 import BlueprintTracker from "./trackers/BlueprintTracker.vue";
+import ItemTracker from "./trackers/ItemTracker.vue";
 
 defineProps<{
   id: string;
@@ -31,6 +32,14 @@ const toggleExpanded = () => {
         </template>
         <template #fallback>
           <div class="placeholder">Loading blueprints...</div>
+        </template>
+      </Suspense>
+      <Suspense v-else-if="id === 'items'">
+        <template #default>
+          <ItemTracker />
+        </template>
+        <template #fallback>
+          <div class="placeholder">Loading items...</div>
         </template>
       </Suspense>
       <p v-else class="placeholder">{{ title }} tracker data will appear here</p>
