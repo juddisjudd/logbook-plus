@@ -80,6 +80,23 @@ export function useQuests() {
     return questTrackers.value.get(questId);
   };
 
+  // Toggle objective completion
+  const toggleObjectiveCompletion = (questId: string, objectiveIndex: number) => {
+    const tracker = getQuestTracker(questId);
+    if (!tracker) return;
+
+    const objectivesCompleted = [...(tracker.objectivesCompleted || [])];
+    objectivesCompleted[objectiveIndex] = !objectivesCompleted[objectiveIndex];
+
+    updateQuestTracker(questId, { objectivesCompleted });
+  };
+
+  // Get objectives completion status
+  const getObjectiveStatus = (questId: string, objectiveIndex: number) => {
+    const tracker = getQuestTracker(questId);
+    return tracker?.objectivesCompleted?.[objectiveIndex] ?? false;
+  };
+
   // Get all active (incomplete) quests
   const activeQuests = computed(() => {
     return Array.from(quests.value.values()).filter((quest) => {
@@ -111,6 +128,8 @@ export function useQuests() {
     getPreviousQuests,
     updateQuestTracker,
     getQuestTracker,
+    toggleObjectiveCompletion,
+    getObjectiveStatus,
     activeQuests,
     completedQuests,
   };

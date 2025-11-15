@@ -3,7 +3,7 @@ import { computed, ref, watch } from "vue";
 import SearchInput from "../SearchInput.vue";
 import { useQuests } from "../../composables/useQuests";
 
-const { getAllQuests, getQuestTracker, updateQuestTracker } = useQuests();
+const { getAllQuests, getQuestTracker, updateQuestTracker, toggleObjectiveCompletion, getObjectiveStatus } = useQuests();
 const selectedQuestId = ref<string | null>(null);
 const searchQuery = ref("");
 
@@ -118,7 +118,14 @@ const toggleQuestCompletion = (questId: string) => {
               v-for="(objective, idx) in selectedQuest.objectives"
               :key="idx"
               class="objective-item"
+              :class="{ completed: getObjectiveStatus(selectedQuest.id, idx) }"
             >
+              <input
+                type="checkbox"
+                class="objective-checkbox"
+                :checked="getObjectiveStatus(selectedQuest.id, idx)"
+                @change="toggleObjectiveCompletion(selectedQuest.id, idx)"
+              />
               <span class="objective-number">{{ idx + 1 }}</span>
               <span class="objective-text">{{ getLocalizedText(objective) }}</span>
             </div>
@@ -160,7 +167,8 @@ const toggleQuestCompletion = (questId: string) => {
 }
 
 .quest-list {
-  width: 45%;
+  width: 200px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--color-border);
@@ -169,6 +177,7 @@ const toggleQuestCompletion = (questId: string) => {
 
 .quest-detail {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -387,10 +396,31 @@ const toggleQuestCompletion = (questId: string) => {
 .objective-item {
   display: flex;
   gap: 8px;
+  align-items: flex-start;
   padding: 8px;
   background: var(--color-bg-secondary);
   border-left: 2px solid var(--color-accent);
   border-radius: 2px;
+  transition: all 0.2s;
+}
+
+.objective-item.completed {
+  opacity: 0.6;
+  border-left-color: var(--color-text-secondary);
+}
+
+.objective-item.completed .objective-text {
+  text-decoration: line-through;
+  color: var(--color-text-secondary);
+}
+
+.objective-checkbox {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: var(--color-accent);
 }
 
 .objective-number {
@@ -413,6 +443,7 @@ const toggleQuestCompletion = (questId: string) => {
   line-height: 1.4;
   display: flex;
   align-items: center;
+  transition: all 0.2s;
 }
 
 .detail-objectives ul,
