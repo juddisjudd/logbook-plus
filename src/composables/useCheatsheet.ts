@@ -1,5 +1,4 @@
 import { computed } from "vue";
-import { useQuests } from "./useQuests";
 import { useHideout } from "./useHideout";
 import { useProjects } from "./useProjects";
 import { useItems } from "./useItems";
@@ -17,27 +16,12 @@ export interface ItemCategory {
 }
 
 export function useCheatsheet() {
-  const { getAllQuests } = useQuests();
   const { getAllHideouts } = useHideout();
   const { getAllProjects } = useProjects();
   const { getItem } = useItems();
 
-  // Gather all unique item IDs and their total quantities from quests
-  const getQuestItems = () => {
-    const itemMap = new Map<string, number>();
-    const quests = getAllQuests();
-
-    quests.forEach((quest) => {
-      if (quest.rewardItemIds && Array.isArray(quest.rewardItemIds)) {
-        quest.rewardItemIds.forEach((item) => {
-          const current = itemMap.get(item.itemId) || 0;
-          itemMap.set(item.itemId, current + (item.quantity || 1));
-        });
-      }
-    });
-
-    return itemMap;
-  };
+  // Note: Quests don't require items - they require completing objectives
+  // So we don't include quest items in the cheatsheet
 
   // Gather all unique item IDs and their total quantities from hideout
   const getHideoutItems = () => {
@@ -96,10 +80,6 @@ export function useCheatsheet() {
   // Get all categories
   const getCheatsheetCategories = computed(() => {
     return [
-      {
-        name: "Quest Items",
-        items: mapToCategory(getQuestItems()),
-      },
       {
         name: "Hideout Items",
         items: mapToCategory(getHideoutItems()),
