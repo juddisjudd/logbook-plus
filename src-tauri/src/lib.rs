@@ -53,6 +53,45 @@ fn get_hotkey(state: tauri::State<AppState>) -> String {
 }
 
 #[tauri::command]
+fn toggle_window_visibility(app: tauri::AppHandle) -> HotkeyResult {
+    if let Some(window) = app.get_webview_window("main") {
+        match window.is_visible() {
+            Ok(is_visible) => {
+                let result = if is_visible {
+                    println!("Command: Hiding window");
+                    window.hide()
+                } else {
+                    println!("Command: Showing window");
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                    Ok(())
+                };
+
+                match result {
+                    Ok(_) => HotkeyResult {
+                        success: true,
+                        message: format!("Window toggled. Visible: {}", !is_visible),
+                    },
+                    Err(e) => HotkeyResult {
+                        success: false,
+                        message: format!("Failed to toggle window: {}", e),
+                    },
+                }
+            }
+            Err(e) => HotkeyResult {
+                success: false,
+                message: format!("Failed to check window visibility: {}", e),
+            },
+        }
+    } else {
+        HotkeyResult {
+            success: false,
+            message: "Main window not found".to_string(),
+        }
+    }
+}
+
+#[tauri::command]
 fn init_hotkey(hotkey: String, app: tauri::AppHandle) -> HotkeyResult {
     // Parse the hotkey string into a Shortcut
     match Shortcut::from_str(&hotkey) {
@@ -121,7 +160,7 @@ pub fn run() {
         .manage(AppState {
             current_hotkey: Mutex::new("F10".to_string()),
         })
-        .invoke_handler(tauri::generate_handler![register_hotkey, get_hotkey, init_hotkey, check_for_updates, install_update])
+        .invoke_handler(tauri::generate_handler![register_hotkey, get_hotkey, init_hotkey, toggle_window_visibility, check_for_updates, install_update])
         .setup(|app| {
             // Register the default hotkey
             let default_hotkey = "F10";
