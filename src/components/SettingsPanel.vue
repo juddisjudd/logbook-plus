@@ -28,20 +28,48 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
   const keys: string[] = [];
 
+  // Add modifier keys
   if (event.ctrlKey) keys.push("ctrl");
   if (event.altKey) keys.push("alt");
   if (event.shiftKey) keys.push("shift");
 
-  // Get the key name
-  const keyName = event.key.length === 1 ? event.key : event.code;
-  const normalizedKey = keyName
-    .replace(/Key/, "") // Remove 'Key' prefix (e.g., KeyA -> A)
-    .replace(/Digit/, "") // Remove 'Digit' prefix (e.g., Digit0 -> 0)
-    .toLowerCase();
+  // Get the main key
+  let mainKey = "";
 
-  // Don't capture just modifier keys
-  if (!["control", "alt", "shift"].includes(normalizedKey)) {
-    keys.push(normalizedKey);
+  // Handle F-keys (F1-F24)
+  if (event.code.startsWith("F")) {
+    mainKey = event.code.toLowerCase(); // "F10" -> "f10"
+  }
+  // Handle number keys from top row (handle Digit prefix)
+  else if (event.code.startsWith("Digit")) {
+    mainKey = event.code.replace("Digit", "").toLowerCase();
+  }
+  // Handle letter keys (handle Key prefix)
+  else if (event.code.startsWith("Key")) {
+    mainKey = event.code.replace("Key", "").toLowerCase();
+  }
+  // Handle special keys
+  else if (event.code === "Enter") {
+    mainKey = "enter";
+  } else if (event.code === "Space") {
+    mainKey = "space";
+  } else if (event.code === "Tab") {
+    mainKey = "tab";
+  } else if (event.code === "Backspace") {
+    mainKey = "backspace";
+  } else if (event.code === "Delete") {
+    mainKey = "delete";
+  } else if (event.code === "Escape") {
+    mainKey = "escape";
+  }
+  // Use event.key as fallback for other keys
+  else {
+    mainKey = event.key.toLowerCase();
+  }
+
+  // Don't capture if only modifier keys were pressed
+  if (mainKey && !["control", "alt", "shift", "meta"].includes(mainKey)) {
+    keys.push(mainKey);
   }
 
   if (keys.length > 0) {
