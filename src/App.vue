@@ -6,6 +6,7 @@ import AppHeader from "./components/AppHeader.vue";
 import TrackerSection from "./components/TrackerSection.vue";
 import SettingsPanel from "./components/SettingsPanel.vue";
 import Cheatsheet from "./components/Cheatsheet.vue";
+import AppFooter from "./components/AppFooter.vue";
 import UpdateNotification from "./components/UpdateNotification.vue";
 
 const showSettings = ref(false);
@@ -72,6 +73,8 @@ const handleCheatsheetToggle = () => {
         />
       </div>
     </div>
+
+    <AppFooter />
   </div>
 </template>
 
