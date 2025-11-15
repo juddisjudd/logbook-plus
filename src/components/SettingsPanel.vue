@@ -88,22 +88,34 @@ const saveHotkey = async () => {
   isSaving.value = true;
 
   try {
-    // Send to backend to register the hotkey
-    const result = await invoke<{ success: boolean; message: string }>(
+    // Save hotkey preference to backend
+    const registerResult = await invoke<{ success: boolean; message: string }>(
       "register_hotkey",
       { hotkey: capturedHotkey }
     );
 
-    if (result.success) {
+    if (!registerResult.success) {
+      hotkeyStatus.value = registerResult.message || "Failed to save hotkey";
+      isSaving.value = false;
+      return;
+    }
+
+    // Initialize the hotkey immediately (don't wait for restart)
+    const initResult = await invoke<{ success: boolean; message: string }>(
+      "init_hotkey",
+      { hotkey: capturedHotkey }
+    );
+
+    if (initResult.success) {
       localStorage.setItem("hotkey", capturedHotkey);
       hotkeyDisplay.value = capturedHotkey;
-      hotkeyStatus.value = "Hotkey saved! Restart the app to apply changes.";
+      hotkeyStatus.value = "Hotkey saved and activated!";
       capturedHotkey = "";
       setTimeout(() => {
         hotkeyStatus.value = "";
-      }, 4000);
+      }, 3000);
     } else {
-      hotkeyStatus.value = result.message || "Failed to save hotkey";
+      hotkeyStatus.value = initResult.message || "Failed to activate hotkey";
     }
   } catch (error) {
     console.error("Error setting hotkey:", error);
@@ -113,14 +125,38 @@ const saveHotkey = async () => {
   }
 };
 
-const resetToDefault = () => {
-  capturedHotkey = "";
-  hotkeyDisplay.value = "F10";
-  localStorage.setItem("hotkey", "F10");
-  hotkeyStatus.value = "Reset to default hotkey (F10). Restart the app to apply.";
-  setTimeout(() => {
-    hotkeyStatus.value = "";
-  }, 3000);
+const resetToDefault = async () => {
+  try {
+    capturedHotkey = "";
+    hotkeyDisplay.value = "F10";
+    localStorage.setItem("hotkey", "F10");
+
+    // Register the default hotkey
+    const registerResult = await invoke<{ success: boolean; message: string }>(
+      "register_hotkey",
+      { hotkey: "F10" }
+    );
+
+    // Initialize the hotkey immediately
+    if (registerResult.success) {
+      const initResult = await invoke<{ success: boolean; message: string }>(
+        "init_hotkey",
+        { hotkey: "F10" }
+      );
+      hotkeyStatus.value = initResult.success
+        ? "Reset to default hotkey (F10). Hotkey activated!"
+        : "Reset but failed to activate: " + initResult.message;
+    } else {
+      hotkeyStatus.value = "Failed to reset: " + registerResult.message;
+    }
+
+    setTimeout(() => {
+      hotkeyStatus.value = "";
+    }, 3000);
+  } catch (error) {
+    console.error("Error resetting hotkey:", error);
+    hotkeyStatus.value = "Error resetting hotkey";
+  }
 };
 </script>
 

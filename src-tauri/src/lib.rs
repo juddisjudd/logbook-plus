@@ -1,7 +1,7 @@
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
 use tauri_plugin_updater::UpdaterExt;
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
-use tauri::{Manager, Emitter};
+use tauri::{Manager, Emitter, Listener};
 use std::sync::Mutex;
 use std::str::FromStr;
 
@@ -123,9 +123,35 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![register_hotkey, get_hotkey, init_hotkey, check_for_updates, install_update])
         .setup(|app| {
-            // Register global shortcut - F10 will emit an event to frontend
-            // The frontend will handle the window toggle
-            let _ = app.global_shortcut().register("F10");
+            // Register the default hotkey
+            let default_hotkey = "f10";
+            match Shortcut::from_str(default_hotkey) {
+                Ok(shortcut) => {
+                    if let Err(e) = app.global_shortcut().register(shortcut) {
+                        eprintln!("Failed to register default hotkey: {}", e);
+                    }
+                }
+                Err(e) => {
+                    eprintln!("Invalid default hotkey format: {}", e);
+                }
+            }
+
+            // Set up global shortcut listener
+            let app_handle = app.app_handle().clone();
+            if let Some(window) = app.get_webview_window("main") {
+                let app_handle_clone = app_handle.clone();
+                window.listen("tauri://global-shortcut", move |_event| {
+                    if let Some(main_window) = app_handle_clone.get_webview_window("main") {
+                        if let Ok(is_visible) = main_window.is_visible() {
+                            let _ = if is_visible {
+                                main_window.hide()
+                            } else {
+                                main_window.show().and_then(|_| main_window.set_focus())
+                            };
+                        }
+                    }
+                });
+            }
 
             // Create tray menu
             let toggle_item = MenuItemBuilder::new("Toggle Window").id("toggle").build(app)?;
@@ -136,9 +162,9 @@ pub fn run() {
                 .items(&[&toggle_item, &settings_item, &quit_item])
                 .build()?;
 
-            // Build tray with menu
-            // Note: Custom tray icon will be loaded automatically from bundle config if available
+            // Build tray icon with application icon
             let tray = tauri::tray::TrayIconBuilder::new()
+                .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu)
                 .on_menu_event(|app, event| {
                     match event.id().as_ref() {

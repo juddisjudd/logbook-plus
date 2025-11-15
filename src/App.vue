@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
-import { invoke } from "@tauri-apps/api/core";
+import { ref, onMounted } from "vue";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { listen, UnlistenFn } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/core";
 import AppHeader from "./components/AppHeader.vue";
 import TrackerSection from "./components/TrackerSection.vue";
 import SettingsPanel from "./components/SettingsPanel.vue";
@@ -10,7 +9,6 @@ import UpdateNotification from "./components/UpdateNotification.vue";
 
 const showSettings = ref(false);
 const appVersion = import.meta.env.PACKAGE_VERSION || "0.1.0";
-let unlistenShortcut: UnlistenFn | null = null;
 
 const trackers = [
   { id: "quests", title: "QUESTS" },
@@ -18,16 +16,6 @@ const trackers = [
   { id: "blueprints", title: "BLUEPRINTS" },
   { id: "items", title: "ITEM LIST" },
 ];
-
-const toggleWindowVisibility = async () => {
-  const window = getCurrentWindow();
-  if ((await window.isVisible())) {
-    await window.hide();
-  } else {
-    await window.show();
-    await window.setFocus();
-  }
-};
 
 onMounted(async () => {
   const appWindow = getCurrentWindow();
@@ -37,19 +25,9 @@ onMounted(async () => {
   const savedHotkey = localStorage.getItem("hotkey") || "F10";
   try {
     await invoke("init_hotkey", { hotkey: savedHotkey });
+    console.log(`Hotkey '${savedHotkey}' initialized successfully`);
   } catch (error) {
-    console.error("Failed to initialize hotkey:", error);
-  }
-
-  // Listen for global shortcut events from Rust backend
-  unlistenShortcut = await listen("tauri://global-shortcut", async () => {
-    await toggleWindowVisibility();
-  });
-});
-
-onUnmounted(async () => {
-  if (unlistenShortcut) {
-    unlistenShortcut();
+    console.error(`Failed to initialize hotkey '${savedHotkey}':`, error);
   }
 });
 
