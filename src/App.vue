@@ -5,9 +5,11 @@ import { invoke } from "@tauri-apps/api/core";
 import AppHeader from "./components/AppHeader.vue";
 import TrackerSection from "./components/TrackerSection.vue";
 import SettingsPanel from "./components/SettingsPanel.vue";
+import Cheatsheet from "./components/Cheatsheet.vue";
 import UpdateNotification from "./components/UpdateNotification.vue";
 
 const showSettings = ref(false);
+const showCheatsheet = ref(false);
 const appVersion = import.meta.env.PACKAGE_VERSION || "0.1.0";
 
 const trackers = [
@@ -39,6 +41,12 @@ const handleClose = async () => {
 
 const handleSettingsToggle = () => {
   showSettings.value = !showSettings.value;
+  showCheatsheet.value = false;
+};
+
+const handleCheatsheetToggle = () => {
+  showCheatsheet.value = !showCheatsheet.value;
+  showSettings.value = false;
 };
 </script>
 
@@ -49,10 +57,12 @@ const handleSettingsToggle = () => {
       :version="appVersion"
       @close="handleClose"
       @settings="handleSettingsToggle"
+      @cheatsheet="handleCheatsheetToggle"
     />
 
     <div class="content-container">
       <SettingsPanel v-if="showSettings" />
+      <Cheatsheet v-else-if="showCheatsheet" />
       <div v-else class="trackers-container">
         <TrackerSection
           v-for="tracker in trackers"

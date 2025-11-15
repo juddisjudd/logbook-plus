@@ -8,6 +8,7 @@ defineProps<{
 defineEmits<{
   close: [];
   settings: [];
+  cheatsheet: [];
 }>();
 
 const handleMouseDown = async () => {
@@ -25,6 +26,13 @@ const handleMouseDown = async () => {
     </div>
 
     <div class="header-right">
+      <button
+        class="icon-button"
+        title="Cheatsheet"
+        @click="$emit('cheatsheet')"
+      >
+        📋
+      </button>
       <button
         class="icon-button"
         title="Settings"
