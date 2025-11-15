@@ -88,16 +88,17 @@ if (!fs.existsSync(arcRaidersData)) {
 
 // Define data directories to sync
 const dataDirs = [
-  { name: 'quests', source: path.join(arcRaidersData, 'quests'), dest: path.join(logbookRoot, 'src/data/quests') },
-  { name: 'hideout', source: path.join(arcRaidersData, 'hideout'), dest: path.join(logbookRoot, 'src/data/hideout') },
-  { name: 'items', source: path.join(arcRaidersData, 'items'), dest: path.join(logbookRoot, 'src/data/items') },
+  { name: 'quests', source: path.join(arcRaidersData, 'quests'), dest: path.join(logbookRoot, 'src/data/quests'), filter: null },
+  { name: 'hideout', source: path.join(arcRaidersData, 'hideout'), dest: path.join(logbookRoot, 'src/data/hideout'), filter: null },
+  { name: 'items', source: path.join(arcRaidersData, 'items'), dest: path.join(logbookRoot, 'src/data/items'), filter: file => !file.endsWith('_blueprint.json') },
+  { name: 'blueprints', source: path.join(arcRaidersData, 'items'), dest: path.join(logbookRoot, 'src/data/blueprints'), filter: file => file.endsWith('_blueprint.json') },
 ];
 
 let changesMade = 0;
 
 // Sync each directory
 for (const dir of dataDirs) {
-  syncDirectory(dir.name, dir.source, dir.dest);
+  syncDirectory(dir.name, dir.source, dir.dest, dir.filter);
 }
 
 console.log('');
@@ -143,7 +144,7 @@ console.log('');
 log('Data sync complete!', 'green');
 
 // Helper function to sync a directory
-function syncDirectory(name, sourceDir, destDir) {
+function syncDirectory(name, sourceDir, destDir, filter = null) {
   if (!fs.existsSync(sourceDir)) {
     log(`✗ Source directory not found: ${sourceDir}`, 'red');
     return;
@@ -155,7 +156,12 @@ function syncDirectory(name, sourceDir, destDir) {
   }
 
   // Get all JSON files from source
-  const files = fs.readdirSync(sourceDir).filter(file => file.endsWith('.json'));
+  let files = fs.readdirSync(sourceDir).filter(file => file.endsWith('.json'));
+
+  // Apply optional filter
+  if (filter) {
+    files = files.filter(filter);
+  }
 
   if (files.length === 0) {
     log(`! No ${name} files found`, 'yellow');

@@ -78,7 +78,16 @@ The scripts synchronize the following directories:
 
 - **Quests** - All quest definitions from `arcraiders-data/quests/` → `src/data/quests/`
 - **Hideout** - Hideout facility data from `arcraiders-data/hideout/` → `src/data/hideout/`
-- **Items** - Item definitions from `arcraiders-data/items/` → `src/data/items/`
+- **Items** - Item definitions from `arcraiders-data/items/` → `src/data/items/` (excludes blueprints)
+- **Blueprints** - Blueprint items from `arcraiders-data/items/` → `src/data/blueprints/` (only files ending in `_blueprint.json`)
+
+### Blueprint Organization
+
+Since blueprints are stored mixed with other items in `arcraiders-data/items/`, the sync scripts intelligently:
+- Copy non-blueprint items to `src/data/items/`
+- Copy blueprint items (ending in `_blueprint.json`) to `src/data/blueprints/`
+
+This maintains your organized folder structure while staying in sync with the source data repository.
 
 ## Workflow
 

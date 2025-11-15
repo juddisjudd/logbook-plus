@@ -26,6 +26,7 @@ sync_directory() {
     local source_dir="$1"
     local dest_dir="$2"
     local data_type="$3"
+    local filter="$4"
 
     if [ ! -d "$source_dir" ]; then
         echo -e "${RED}Source directory not found: $source_dir${NC}"
@@ -37,12 +38,30 @@ sync_directory() {
         mkdir -p "$dest_dir"
     fi
 
-    # Copy files
+    # Copy files based on filter
     local file_count=0
-    while IFS= read -r -d '' file; do
-        cp "$file" "$dest_dir/"
-        ((file_count++))
-    done < <(find "$source_dir" -maxdepth 1 -name "*.json" -print0)
+
+    if [ "$filter" = "blueprints_only" ]; then
+        # Copy only blueprint files
+        while IFS= read -r -d '' file; do
+            cp "$file" "$dest_dir/"
+            ((file_count++))
+        done < <(find "$source_dir" -maxdepth 1 -name "*_blueprint.json" -print0)
+    elif [ "$filter" = "exclude_blueprints" ]; then
+        # Copy all files except blueprints
+        while IFS= read -r -d '' file; do
+            if [[ ! "$file" =~ _blueprint\.json$ ]]; then
+                cp "$file" "$dest_dir/"
+                ((file_count++))
+            fi
+        done < <(find "$source_dir" -maxdepth 1 -name "*.json" -print0)
+    else
+        # Copy all JSON files
+        while IFS= read -r -d '' file; do
+            cp "$file" "$dest_dir/"
+            ((file_count++))
+        done < <(find "$source_dir" -maxdepth 1 -name "*.json" -print0)
+    fi
 
     if [ $file_count -gt 0 ]; then
         echo -e "${GREEN}✓ Synced $file_count $data_type files${NC}"
@@ -55,17 +74,22 @@ sync_directory() {
 changes_made=0
 
 # Sync quests
-if sync_directory "$ARCRAIDERS_DATA/quests" "$LOGBOOK_ROOT/src/data/quests" "quest"; then
+if sync_directory "$ARCRAIDERS_DATA/quests" "$LOGBOOK_ROOT/src/data/quests" "quest" ""; then
     ((changes_made++))
 fi
 
 # Sync hideout
-if sync_directory "$ARCRAIDERS_DATA/hideout" "$LOGBOOK_ROOT/src/data/hideout" "hideout"; then
+if sync_directory "$ARCRAIDERS_DATA/hideout" "$LOGBOOK_ROOT/src/data/hideout" "hideout" ""; then
     ((changes_made++))
 fi
 
-# Sync items
-if sync_directory "$ARCRAIDERS_DATA/items" "$LOGBOOK_ROOT/src/data/items" "item"; then
+# Sync items (exclude blueprints)
+if sync_directory "$ARCRAIDERS_DATA/items" "$LOGBOOK_ROOT/src/data/items" "item" "exclude_blueprints"; then
+    ((changes_made++))
+fi
+
+# Sync blueprints only
+if sync_directory "$ARCRAIDERS_DATA/items" "$LOGBOOK_ROOT/src/data/blueprints" "blueprint" "blueprints_only"; then
     ((changes_made++))
 fi
 

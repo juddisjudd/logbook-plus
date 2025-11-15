@@ -23,19 +23,25 @@ setlocal enabledelayedexpansion
 set "changes_made=0"
 
 REM Sync quests
-call :sync_directory "%ARCRAIDERS_DATA%\quests" "%LOGBOOK_ROOT%\src\data\quests" "quest"
+call :sync_directory "%ARCRAIDERS_DATA%\quests" "%LOGBOOK_ROOT%\src\data\quests" "quest" ""
 if !errorlevel! equ 0 (
     set /a changes_made+=1
 )
 
 REM Sync hideout
-call :sync_directory "%ARCRAIDERS_DATA%\hideout" "%LOGBOOK_ROOT%\src\data\hideout" "hideout"
+call :sync_directory "%ARCRAIDERS_DATA%\hideout" "%LOGBOOK_ROOT%\src\data\hideout" "hideout" ""
 if !errorlevel! equ 0 (
     set /a changes_made+=1
 )
 
-REM Sync items
-call :sync_directory "%ARCRAIDERS_DATA%\items" "%LOGBOOK_ROOT%\src\data\items" "item"
+REM Sync items (exclude blueprints)
+call :sync_directory "%ARCRAIDERS_DATA%\items" "%LOGBOOK_ROOT%\src\data\items" "item" "*blueprint*.json"
+if !errorlevel! equ 0 (
+    set /a changes_made+=1
+)
+
+REM Sync blueprints only
+call :sync_directory "%ARCRAIDERS_DATA%\items" "%LOGBOOK_ROOT%\src\data\blueprints" "blueprint" "BLUEPRINTS_ONLY"
 if !errorlevel! equ 0 (
     set /a changes_made+=1
 )
@@ -68,10 +74,11 @@ pause
 exit /b 0
 
 :sync_directory
-setlocal
+setlocal enabledelayedexpansion
 set "source_dir=%~1"
 set "dest_dir=%~2"
 set "data_type=%~3"
+set "filter=%~4"
 
 if not exist "%source_dir%" (
     echo [ERROR] Source directory not found: %source_dir%
@@ -85,9 +92,27 @@ if not exist "%dest_dir%" (
 
 REM Count and copy files
 set "file_count=0"
-for /r "%source_dir%" %%F in (*.json) do (
-    copy /Y "%%F" "%dest_dir%\" >nul 2>&1
-    set /a file_count+=1
+if "%filter%"=="BLUEPRINTS_ONLY" (
+    REM Copy only blueprint files
+    for %%F in ("%source_dir%\*_blueprint.json") do (
+        copy /Y "%%F" "%dest_dir%\" >nul 2>&1
+        set /a file_count+=1
+    )
+) else if "%filter%"=="" (
+    REM Copy all JSON files
+    for %%F in ("%source_dir%\*.json") do (
+        copy /Y "%%F" "%dest_dir%\" >nul 2>&1
+        set /a file_count+=1
+    )
+) else (
+    REM Copy all except blueprint files
+    for %%F in ("%source_dir%\*.json") do (
+        set "filename=%%~nxF"
+        if not "!filename!"=="*blueprint.json" (
+            copy /Y "%%F" "%dest_dir%\" >nul 2>&1
+            set /a file_count+=1
+        )
+    )
 )
 
 if !file_count! gtr 0 (
