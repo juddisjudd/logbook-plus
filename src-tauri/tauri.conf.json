@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "Logbook+",
         "width": 400,
         "height": 600,
