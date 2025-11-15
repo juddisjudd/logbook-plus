@@ -1,4 +1,4 @@
-use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
+use tauri_plugin_global_shortcut::GlobalShortcutExt;
 use tauri_plugin_updater::UpdaterExt;
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::{Manager, Emitter};
