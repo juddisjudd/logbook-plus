@@ -11,7 +11,10 @@ const checkForUpdates = async () => {
     const hasUpdate = await invoke<boolean>("check_for_updates");
     showUpdate.value = hasUpdate;
   } catch (error) {
-    console.error("Failed to check for updates:", error);
+    // Silently fail in dev mode - updater endpoint may not be available
+    if (import.meta.env.PROD) {
+      console.error("Failed to check for updates:", error);
+    }
   }
 };
 
