@@ -1,7 +1,7 @@
-use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 use tauri_plugin_updater::UpdaterExt;
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
-use tauri::{Manager, Emitter, Listener};
+use tauri::{Manager, Emitter};
 use std::sync::Mutex;
 use std::str::FromStr;
 
@@ -162,13 +162,31 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![register_hotkey, get_hotkey, init_hotkey, toggle_window_visibility, check_for_updates, install_update])
         .setup(|app| {
-            // Register the default hotkey
+            // Register the default hotkey with proper handler for window toggle
             let default_hotkey = "F10";
 
-            // Register the hotkey
+            // Register hotkey with handler using on_shortcut()
             match Shortcut::from_str(default_hotkey) {
                 Ok(shortcut) => {
-                    match app.global_shortcut().register(shortcut) {
+                    // Use on_shortcut() to register with a proper handler
+                    // The handler closure is called when the hotkey is pressed
+                    match app.global_shortcut().on_shortcut(shortcut, |app, _shortcut, event| {
+                        // Only act on pressed events, not released
+                        if event.state == ShortcutState::Pressed {
+                            if let Some(window) = app.get_webview_window("main") {
+                                if let Ok(is_visible) = window.is_visible() {
+                                    if is_visible {
+                                        let _ = window.hide();
+                                        println!("Hotkey F10: Window hidden");
+                                    } else {
+                                        let _ = window.show();
+                                        let _ = window.set_focus();
+                                        println!("Hotkey F10: Window shown and focused");
+                                    }
+                                }
+                            }
+                        }
+                    }) {
                         Ok(_) => println!("Successfully registered hotkey: {}", default_hotkey),
                         Err(e) => eprintln!("Failed to register default hotkey: {}", e),
                     }
@@ -177,12 +195,6 @@ pub fn run() {
                     eprintln!("Invalid default hotkey format: {}", e);
                 }
             }
-
-            // NOTE: Tauri v2 global-shortcut plugin event listening not working
-            // The plugin registers shortcuts successfully but doesn't emit events
-            // that can be listened to in the application. This is a plugin limitation.
-            //
-            // Workaround: Use toggle_window_visibility command or tray menu button
 
             // Create tray menu
             let toggle_item = MenuItemBuilder::new("Toggle Window").id("toggle").build(app)?;
