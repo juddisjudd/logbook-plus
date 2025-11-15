@@ -7,10 +7,7 @@ A lightweight overlay application for the [Arc Raiders](https://www.arcraiders.c
 - **Quest Tracker** - Search and track quests by name, mark objectives as complete
 - **Hideout Tracker** - Monitor your hideout facility upgrades and level progression
 - **Blueprint Tracker** - Keep track of collected blueprints for 40+ different items
-- **System Tray** - Quick access from your Windows system tray with one-click toggle
-- **Hotkey** - Press **F10** to instantly show/hide the overlay while playing
 - **Auto-Update** - Get notified of new versions automatically
-- **Minimal Design** - Always-on-top overlay with Arc Raiders aesthetic
 
 ## Getting Started
 
@@ -36,6 +33,10 @@ A lightweight overlay application for the [Arc Raiders](https://www.arcraiders.c
 Supported formats:
 - Single keys: `F10`, `F1`-`F24`
 - Combinations: `Ctrl+Shift+L`, `Alt+K`, `Ctrl+Alt+M`
+
+## Data & Credits
+
+Game data provided by the [arcraiders-data](https://github.com/RaidTheory/arcraiders-data) project.
 
 ## License
 
