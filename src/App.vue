@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import AppHeader from "./components/AppHeader.vue";
@@ -18,22 +19,31 @@ const trackers = [
   { id: "items", title: "ITEM LIST" },
 ];
 
+const toggleWindowVisibility = async () => {
+  const window = getCurrentWindow();
+  if ((await window.isVisible())) {
+    await window.hide();
+  } else {
+    await window.show();
+    await window.setFocus();
+  }
+};
+
 onMounted(async () => {
   const appWindow = getCurrentWindow();
   await appWindow.setTitle("Logbook+");
 
-  // Listen for global shortcut event from Rust backend
-  unlistenShortcut = await listen<{ shortcut: string }>("tauri://global-shortcut", async (event) => {
-    // Check if it's F10 hotkey
-    if (event.payload?.shortcut === "F10") {
-      const window = getCurrentWindow();
-      if ((await window.isVisible())) {
-        await window.hide();
-      } else {
-        await window.show();
-        await window.setFocus();
-      }
-    }
+  // Load and initialize the saved hotkey
+  const savedHotkey = localStorage.getItem("hotkey") || "F10";
+  try {
+    await invoke("init_hotkey", { hotkey: savedHotkey });
+  } catch (error) {
+    console.error("Failed to initialize hotkey:", error);
+  }
+
+  // Listen for global shortcut events from Rust backend
+  unlistenShortcut = await listen("tauri://global-shortcut", async () => {
+    await toggleWindowVisibility();
   });
 });
 

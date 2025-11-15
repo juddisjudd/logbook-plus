@@ -1,8 +1,9 @@
-use tauri_plugin_global_shortcut::GlobalShortcutExt;
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
 use tauri_plugin_updater::UpdaterExt;
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::{Manager, Emitter};
 use std::sync::Mutex;
+use std::str::FromStr;
 
 #[derive(serde::Serialize)]
 pub struct HotkeyResult {
@@ -52,6 +53,33 @@ fn get_hotkey(state: tauri::State<AppState>) -> String {
 }
 
 #[tauri::command]
+fn init_hotkey(hotkey: String, app: tauri::AppHandle) -> HotkeyResult {
+    // Parse the hotkey string into a Shortcut
+    match Shortcut::from_str(&hotkey) {
+        Ok(shortcut) => {
+            // Unregister all existing hotkeys first
+            let _ = app.global_shortcut().unregister_all();
+
+            // Register the new hotkey
+            match app.global_shortcut().register(shortcut) {
+                Ok(_) => HotkeyResult {
+                    success: true,
+                    message: format!("Hotkey '{}' activated", hotkey),
+                },
+                Err(e) => HotkeyResult {
+                    success: false,
+                    message: format!("Failed to register hotkey: {}", e),
+                },
+            }
+        }
+        Err(_) => HotkeyResult {
+            success: false,
+            message: format!("Invalid hotkey format: '{}'. Use F10, ctrl+shift+l, etc.", hotkey),
+        },
+    }
+}
+
+#[tauri::command]
 async fn check_for_updates(app_handle: tauri::AppHandle) -> Result<bool, String> {
     let updater = app_handle.updater()
         .map_err(|e| format!("Failed to initialize updater: {}", e))?;
@@ -93,7 +121,7 @@ pub fn run() {
         .manage(AppState {
             current_hotkey: Mutex::new("F10".to_string()),
         })
-        .invoke_handler(tauri::generate_handler![register_hotkey, get_hotkey, check_for_updates, install_update])
+        .invoke_handler(tauri::generate_handler![register_hotkey, get_hotkey, init_hotkey, check_for_updates, install_update])
         .setup(|app| {
             // Register global shortcut - F10 will emit an event to frontend
             // The frontend will handle the window toggle
