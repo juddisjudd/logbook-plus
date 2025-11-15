@@ -42,7 +42,7 @@ onUnmounted(async () => {
 
 const handleClose = async () => {
   const appWindow = getCurrentWindow();
-  await appWindow.hide();
+  await appWindow.close();
 };
 
 const handleSettingsToggle = () => {

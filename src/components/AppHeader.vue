@@ -66,16 +66,18 @@ const handleMouseDown = async () => {
 
 .title {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 700;
   color: var(--color-text-primary);
   margin: 0;
   letter-spacing: 0.5px;
+  font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .version {
   font-size: 10px;
   color: var(--color-text-secondary);
-  font-family: "Courier New", monospace;
+  font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 400;
 }
 
 .header-right {
@@ -97,6 +99,7 @@ const handleMouseDown = async () => {
   transition: color 0.2s;
   min-width: 24px;
   height: 24px;
+  font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .icon-button:hover {

@@ -56,11 +56,12 @@ const toggleExpanded = () => {
 
 .section-title {
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;
   color: var(--color-text-primary);
   margin: 0;
   letter-spacing: 0.5px;
   text-transform: uppercase;
+  font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .section-content {
