@@ -17,7 +17,16 @@ pub struct AppState {
 #[tauri::command]
 fn register_hotkey(hotkey: String, state: tauri::State<AppState>) -> HotkeyResult {
     // Validate format (allow single keys like F10, or combinations with +)
-    if hotkey.is_empty() || hotkey.len() < 2 {
+    if hotkey.is_empty() {
+        return HotkeyResult {
+            success: false,
+            message: "Invalid hotkey format. Hotkey cannot be empty.".to_string(),
+        };
+    }
+
+    // Basic validation - should contain alphanumeric or valid key names
+    let valid_pattern = hotkey.chars().all(|c| c.is_alphanumeric() || c == '+' || c == '-');
+    if !valid_pattern {
         return HotkeyResult {
             success: false,
             message: "Invalid hotkey format. Use F10, ctrl+shift+l, alt+k, etc.".to_string(),
@@ -31,7 +40,7 @@ fn register_hotkey(hotkey: String, state: tauri::State<AppState>) -> HotkeyResul
 
     HotkeyResult {
         success: true,
-        message: format!("Hotkey preference saved: {}. Please restart the app to apply changes.", hotkey),
+        message: format!("Hotkey '{}' saved! Please restart the app to apply changes.", hotkey),
     }
 }
 
@@ -86,7 +95,8 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![register_hotkey, get_hotkey, check_for_updates, install_update])
         .setup(|app| {
-            // Register global shortcut - F10 will toggle window visibility
+            // Register global shortcut - F10 will emit an event to frontend
+            // The frontend will handle the window toggle
             let _ = app.global_shortcut().register("F10");
 
             // Create tray menu
