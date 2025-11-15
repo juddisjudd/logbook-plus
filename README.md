@@ -1,17 +1,17 @@
-# Logbook+
+# Logbook+ - Arc Raiders Overlay
 
-A Tauri-based frameless overlay application for Arc Raiders game. Track quests, hideout progression, blueprints, and items with a sleek, always-on-top interface.
+A lightweight Tauri-based frameless overlay application for the [Arc Raiders](https://www.arcraiders.com/) game. Track quests, hideout progression, and blueprints with a sleek, always-on-top interface designed to stay out of your way during gameplay.
 
 ## Features
 
-- **Quest Tracker** - Search and track quests by name or trader, mark individual objectives as complete
+- **Quest Tracker** - Search and track quests by name, mark individual objectives as complete
 - **Hideout Tracker** - Monitor hideout facility upgrades with level selection and requirements display
 - **Blueprint Tracker** - Track collected blueprints across 40 different items
-- **Item List** - (Coming soon)
-- **System Tray Integration** - Quick access from Windows system tray
-- **Global Hotkey** - Press F10 (or custom hotkey) to show/hide the overlay
-- **Frameless Window** - Always on top, minimal UI for immersive gameplay
-- **Dark Theme** - Arc Raiders aesthetic with warm orange accents
+- **System Tray Integration** - Quick access from Windows system tray with window toggle and settings
+- **Global Hotkey** - Press F10 (or configure custom hotkey) to show/hide the overlay
+- **Auto-Update** - Automatically checks for new releases and notifies you of available updates
+- **Frameless Window** - Always-on-top, minimal UI designed to complement gameplay
+- **Dark Theme** - Arc Raiders aesthetic with warm orange accents (#F2A413)
 
 ## Development
 
@@ -58,15 +58,13 @@ Releases are automatically created when you push a git tag. To create a new rele
    ```
 
 3. The GitHub Actions workflow will automatically:
-   - Build the application for Windows, macOS, and Linux
+   - Build the application for Windows (x86_64)
    - Create a GitHub release
-   - Upload installers and binaries as release assets
+   - Upload installers and portable binary as release assets
 
 ### Release Assets
 
-- **Windows**: `.msi` installer and portable `.exe`
-- **macOS**: `.dmg` disk image (Universal binary for x86_64 and aarch64)
-- **Linux**: AppImage and `.deb` packages
+- **Windows**: `.msi` installer and portable `.exe` executable
 
 ## Project Structure
 
@@ -110,11 +108,19 @@ Supported hotkey formats:
 - **Desktop**: Tauri 2
 - **Package Manager**: Bun
 - **Build**: Cargo (Rust)
+- **Auto-Update**: Tauri Plugin Updater
 - **UI Framework**: Custom CSS with Arc Raiders aesthetic
+
+## Data Sources
+
+This project utilizes game data from:
+- **[arcraiders-data](https://github.com/RaidTheory/arcraiders-data)** - Comprehensive Arc Raiders game data repository
 
 ## License
 
-Licensed under the Arc Raiders game terms. See LICENSE file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+Arc Raiders is a registered trademark of Embark Studios. This project is an unofficial overlay tool and is not affiliated with or endorsed by Embark Studios.
 
 ## Contributing
 
