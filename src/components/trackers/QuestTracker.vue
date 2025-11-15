@@ -62,19 +62,20 @@ const toggleQuestCompletion = (questId: string) => {
 
 <template>
   <div class="quest-tracker">
-    <div class="quest-list">
-      <div class="quest-controls">
-        <SearchInput
-          v-model="searchQuery"
-          placeholder="Search quests..."
-        />
-      </div>
+    <div class="quest-controls">
+      <SearchInput
+        v-model="searchQuery"
+        placeholder="Search quests..."
+      />
+    </div>
 
-      <div v-if="quests.length === 0" class="empty-state">
-        <p>No quests available</p>
-      </div>
+    <div class="quest-panels">
+      <div class="quest-list">
+        <div v-if="quests.length === 0" class="empty-state">
+          <p>No quests available</p>
+        </div>
 
-      <div v-else class="quest-items">
+        <div v-else class="quest-items">
         <button
           v-for="quest in quests"
           :key="quest.id"
@@ -155,13 +156,32 @@ const toggleQuestCompletion = (questId: string) => {
         <p>Select a quest to view details</p>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .quest-tracker {
   display: flex;
+  flex-direction: column;
   height: 100%;
+  gap: 0;
+  overflow: hidden;
+}
+
+.quest-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  flex-shrink: 0;
+}
+
+.quest-panels {
+  display: flex;
+  flex: 1;
   gap: 0;
   overflow: hidden;
 }
@@ -181,15 +201,6 @@ const toggleQuestCompletion = (questId: string) => {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-}
-
-.quest-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-bg-secondary);
 }
 
 .empty-state {

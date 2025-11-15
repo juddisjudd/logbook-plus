@@ -4,6 +4,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import AppHeader from "./components/AppHeader.vue";
 import TrackerSection from "./components/TrackerSection.vue";
+import SettingsPanel from "./components/SettingsPanel.vue";
 
 const showSettings = ref(false);
 const appVersion = import.meta.env.PACKAGE_VERSION || "0.1.0";
@@ -22,7 +23,9 @@ onMounted(async () => {
 
   // Listen for global shortcut event from Rust backend
   unlistenShortcut = await listen<string>("tauri://global-shortcut", async (event) => {
-    if ((event.payload as unknown as string)?.includes?.("ctrl+shift+l")) {
+    const payload = (event.payload as unknown as string) || "";
+    // Handle any hotkey trigger (F10 or custom hotkey)
+    if (payload.length > 0) {
       const window = getCurrentWindow();
       if ((await window.isVisible())) {
         await window.hide();
@@ -58,13 +61,16 @@ const handleSettingsToggle = () => {
       @settings="handleSettingsToggle"
     />
 
-    <div class="trackers-container">
-      <TrackerSection
-        v-for="tracker in trackers"
-        :key="tracker.id"
-        :id="tracker.id"
-        :title="tracker.title"
-      />
+    <div class="content-container">
+      <SettingsPanel v-if="showSettings" />
+      <div v-else class="trackers-container">
+        <TrackerSection
+          v-for="tracker in trackers"
+          :key="tracker.id"
+          :id="tracker.id"
+          :title="tracker.title"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -80,6 +86,14 @@ const handleSettingsToggle = () => {
   width: 100%;
   height: 100%;
   background: var(--color-bg-primary);
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
 }
 
 .trackers-container {

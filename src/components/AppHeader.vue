@@ -19,6 +19,7 @@ const handleMouseDown = async () => {
 <template>
   <header class="app-header">
     <div class="header-left" @mousedown="handleMouseDown">
+      <img src="../assets/icon-lines.png" alt="Logbook+" class="logo-icon" />
       <h1 class="title">Logbook+</h1>
       <span class="version">v{{ version }}</span>
     </div>
@@ -60,6 +61,11 @@ const handleMouseDown = async () => {
   gap: 8px;
   -webkit-app-region: drag;
   flex: 1;
+}
+
+.logo-icon {
+  width: 35px;
+  height: auto;
 }
 
 .title {

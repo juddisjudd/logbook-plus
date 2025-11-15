@@ -9,7 +9,9 @@
       "Bash(do grep -q '\"\"name\"\"' \"$f\")",
       "Bash(echo:*)",
       "Bash(do if ! grep -q '\"\"description\"\"' \"$f\")",
-      "Bash(then echo \"Missing description in: $f\")"
+      "Bash(then echo \"Missing description in: $f\")",
+      "Bash(bun run build)",
+      "Bash(cargo build:*)"
     ],
     "deny": [],
     "ask": []
