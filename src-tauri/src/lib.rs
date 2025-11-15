@@ -97,18 +97,19 @@ pub fn run() {
                 .items(&[&toggle_item, &settings_item, &quit_item])
                 .build()?;
 
-            let _tray = tauri::tray::TrayIconBuilder::new()
+            tauri::tray::TrayIconBuilder::new()
                 .menu(&menu)
                 .on_menu_event(|app, event| {
                     match event.id().as_ref() {
                         "toggle" => {
-                            let window = app.get_webview_window("main").unwrap();
-                            let is_visible = window.is_visible().unwrap_or(false);
-                            if is_visible {
-                                let _ = window.hide();
-                            } else {
-                                let _ = window.show();
-                                let _ = window.set_focus();
+                            if let Some(window) = app.get_webview_window("main") {
+                                let is_visible = window.is_visible().unwrap_or(false);
+                                if is_visible {
+                                    let _ = window.hide();
+                                } else {
+                                    let _ = window.show();
+                                    let _ = window.set_focus();
+                                }
                             }
                         }
                         "settings" => {
