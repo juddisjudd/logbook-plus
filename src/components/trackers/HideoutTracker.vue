@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import SearchInput from "../SearchInput.vue";
+import ItemImage from "../ItemImage.vue";
 import { useHideout } from "../../composables/useHideout";
+import { useItems } from "../../composables/useItems";
 import { ref } from "vue";
 
 const { getAllHideouts, getHideoutTracker, setHideoutLevel, getNextLevelDetails, isMaxLevel } = useHideout();
+const { getItem } = useItems();
 const searchQuery = ref("");
 
 const getLocalizedText = (localized: Record<string, string>) => {
@@ -101,11 +104,17 @@ const getProgressPercentage = (hideoutId: string) => {
 
           <div v-if="!isMaxLevel(hideout.id) && getNextLevelDetails(hideout.id) && getNextLevelDetails(hideout.id)!.requirementItemIds.length > 0" class="next-requirements">
             <strong>Next Level Requirements:</strong>
-            <ul>
-              <li v-for="(requirement, idx) in getNextLevelDetails(hideout.id)!.requirementItemIds" :key="idx">
-                {{ requirement.itemId }} × {{ requirement.quantity }}
-              </li>
-            </ul>
+            <div class="requirements-grid">
+              <div v-for="(requirement, idx) in getNextLevelDetails(hideout.id)!.requirementItemIds" :key="idx" class="requirement-item">
+                <ItemImage
+                  :item-id="requirement.itemId"
+                  :item-name="getItem(requirement.itemId)?.name?.en"
+                  size="small"
+                  show-label
+                />
+                <span class="requirement-quantity">×{{ requirement.quantity }}</span>
+              </div>
+            </div>
           </div>
 
           <div v-if="isMaxLevel(hideout.id)" class="maxed-out">
@@ -265,23 +274,40 @@ const getProgressPercentage = (hideoutId: string) => {
   display: block;
   color: var(--color-text-secondary);
   font-weight: 500;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.next-requirements ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.requirements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 8px;
 }
 
-.next-requirements li {
-  color: var(--color-text-secondary);
+.requirement-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  background: var(--color-bg-primary);
+  border-radius: 2px;
+  border: 1px solid var(--color-border);
+  position: relative;
+}
+
+.requirement-quantity {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-accent);
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: var(--color-bg-secondary);
+  padding: 2px 4px;
+  border-radius: 2px;
 }
 
 .maxed-out {
