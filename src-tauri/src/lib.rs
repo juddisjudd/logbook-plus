@@ -99,8 +99,23 @@ fn init_hotkey(hotkey: String, app: tauri::AppHandle) -> HotkeyResult {
             // Unregister all existing hotkeys first
             let _ = app.global_shortcut().unregister_all();
 
-            // Register the new hotkey
-            match app.global_shortcut().register(shortcut) {
+            // Register the new hotkey WITH a handler (critical!)
+            match app.global_shortcut().on_shortcut(shortcut, |app, _shortcut, event| {
+                if event.state == ShortcutState::Pressed {
+                    if let Some(window) = app.get_webview_window("main") {
+                        if let Ok(is_visible) = window.is_visible() {
+                            if is_visible {
+                                let _ = window.hide();
+                                println!("Hotkey: Window hidden");
+                            } else {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                                println!("Hotkey: Window shown and focused");
+                            }
+                        }
+                    }
+                }
+            }) {
                 Ok(_) => HotkeyResult {
                     success: true,
                     message: format!("Hotkey '{}' activated", hotkey),
