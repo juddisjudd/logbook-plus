@@ -5,7 +5,6 @@ import { useQuests } from "../../composables/useQuests";
 
 const { getAllQuests, getQuestTracker, updateQuestTracker } = useQuests();
 const selectedQuestId = ref<string | null>(null);
-const filterCompleted = ref(false);
 const searchQuery = ref("");
 
 const getLocalizedText = (localized: Record<string, string>) => {
@@ -14,19 +13,6 @@ const getLocalizedText = (localized: Record<string, string>) => {
 
 const quests = computed(() => {
   let filtered = getAllQuests();
-
-  // Filter by completion status
-  if (filterCompleted.value) {
-    filtered = filtered.filter((quest) => {
-      const tracker = getQuestTracker(quest.id);
-      return tracker?.isCompleted;
-    });
-  } else {
-    filtered = filtered.filter((quest) => {
-      const tracker = getQuestTracker(quest.id);
-      return !tracker?.isCompleted;
-    });
-  }
 
   // Filter by search query
   if (searchQuery.value.trim()) {
@@ -37,6 +23,14 @@ const quests = computed(() => {
       return questName.includes(query) || traderName.includes(query);
     });
   }
+
+  // Sort: active quests first, then completed
+  filtered.sort((a, b) => {
+    const aCompleted = getQuestTracker(a.id)?.isCompleted ?? false;
+    const bCompleted = getQuestTracker(b.id)?.isCompleted ?? false;
+    if (aCompleted === bCompleted) return 0;
+    return aCompleted ? 1 : -1;
+  });
 
   return filtered;
 });
@@ -73,13 +67,6 @@ const toggleQuestCompletion = (questId: string) => {
           v-model="searchQuery"
           placeholder="Search quests..."
         />
-        <label class="filter-toggle">
-          <input
-            v-model="filterCompleted"
-            type="checkbox"
-          />
-          <span>Completed</span>
-        </label>
       </div>
 
       <div v-if="quests.length === 0" class="empty-state">
@@ -91,14 +78,17 @@ const toggleQuestCompletion = (questId: string) => {
           v-for="quest in quests"
           :key="quest.id"
           class="quest-item"
-          :class="{ active: selectedQuestId === quest.id }"
+          :class="{
+            active: selectedQuestId === quest.id,
+            completed: getQuestTracker(quest.id)?.isCompleted
+          }"
           @click="selectedQuestId = quest.id"
         >
           <div class="quest-item-header">
             <span class="quest-name">{{ getLocalizedText(quest.name) }}</span>
             <span class="quest-trader">{{ quest.trader }}</span>
           </div>
-          <span v-if="questTracker?.isCompleted" class="completed-badge">✓</span>
+          <span v-if="getQuestTracker(quest.id)?.isCompleted" class="completed-badge">✓</span>
         </button>
       </div>
     </div>
@@ -112,7 +102,7 @@ const toggleQuestCompletion = (questId: string) => {
             :class="{ completed: questTracker?.isCompleted }"
             @click="toggleQuestCompletion(selectedQuest.id)"
           >
-            {{ questTracker?.isCompleted ? "✓ Completed" : "Mark Complete" }}
+            {{ questTracker?.isCompleted ? "↺ Undo" : "Mark Complete" }}
           </button>
         </div>
 
@@ -182,20 +172,6 @@ const toggleQuestCompletion = (questId: string) => {
   background: var(--color-bg-secondary);
 }
 
-.filter-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-
-.filter-toggle input {
-  cursor: pointer;
-  accent-color: var(--color-accent);
-}
-
 .empty-state {
   flex: 1;
   display: flex;
@@ -233,6 +209,15 @@ const toggleQuestCompletion = (questId: string) => {
   padding-left: 9px;
 }
 
+.quest-item.completed {
+  opacity: 0.6;
+}
+
+.quest-item.completed .quest-name {
+  text-decoration: line-through;
+  color: var(--color-text-secondary);
+}
+
 .quest-item-header {
   display: flex;
   flex-direction: column;
@@ -248,6 +233,7 @@ const toggleQuestCompletion = (questId: string) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: all 0.2s;
 }
 
 .quest-trader {
@@ -293,7 +279,7 @@ const toggleQuestCompletion = (questId: string) => {
   font-weight: 500;
   cursor: pointer;
   border-radius: 2px;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
   white-space: nowrap;
 }
 
@@ -302,8 +288,15 @@ const toggleQuestCompletion = (questId: string) => {
 }
 
 .completion-btn.completed {
-  background: #4da6ff;
-  opacity: 0.7;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  opacity: 1;
+}
+
+.completion-btn.completed:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 .detail-trader,
