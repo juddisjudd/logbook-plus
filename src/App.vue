@@ -5,6 +5,7 @@ import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import AppHeader from "./components/AppHeader.vue";
 import TrackerSection from "./components/TrackerSection.vue";
 import SettingsPanel from "./components/SettingsPanel.vue";
+import UpdateNotification from "./components/UpdateNotification.vue";
 
 const showSettings = ref(false);
 const appVersion = import.meta.env.PACKAGE_VERSION || "0.1.0";
@@ -55,6 +56,7 @@ const handleSettingsToggle = () => {
 
 <template>
   <div class="app-root">
+    <UpdateNotification />
     <AppHeader
       :version="appVersion"
       @close="handleClose"

@@ -11,7 +11,11 @@
       "Bash(do if ! grep -q '\"\"description\"\"' \"$f\")",
       "Bash(then echo \"Missing description in: $f\")",
       "Bash(bun run build)",
-      "Bash(cargo build:*)"
+      "Bash(cargo build:*)",
+      "Bash(mkdir:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd GitHub workflows for automated builds and releases\n\n- Add release.yml: Automatically builds and creates releases for Windows, macOS, and Linux when tags are pushed\n- Add build.yml: Runs build checks on all platforms for pushes to main/master and PRs\n- Windows builds configured with MSVC toolchain\n- macOS builds for both x86_64 and aarch64 architectures\n- Linux builds with required GTK dependencies\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
