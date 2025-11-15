@@ -17,11 +17,8 @@ const handleMouseDown = async () => {
 </script>
 
 <template>
-  <header
-    class="app-header"
-    @mousedown="handleMouseDown"
-  >
-    <div class="header-left">
+  <header class="app-header">
+    <div class="header-left" @mousedown="handleMouseDown">
       <h1 class="title">Logbook+</h1>
       <span class="version">v{{ version }}</span>
     </div>
@@ -54,7 +51,6 @@ const handleMouseDown = async () => {
   background: var(--color-bg-secondary);
   border-bottom: 1px solid var(--color-border);
   user-select: none;
-  -webkit-app-region: drag;
   height: 40px;
 }
 
@@ -62,6 +58,8 @@ const handleMouseDown = async () => {
   display: flex;
   align-items: center;
   gap: 8px;
+  -webkit-app-region: drag;
+  flex: 1;
 }
 
 .title {
@@ -83,7 +81,6 @@ const handleMouseDown = async () => {
 .header-right {
   display: flex;
   gap: 4px;
-  -webkit-app-region: no-drag;
 }
 
 .icon-button {
