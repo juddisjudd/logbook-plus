@@ -23,10 +23,9 @@ onMounted(async () => {
   await appWindow.setTitle("Logbook+");
 
   // Listen for global shortcut event from Rust backend
-  unlistenShortcut = await listen<string>("tauri://global-shortcut", async (event) => {
-    const payload = (event.payload as unknown as string) || "";
-    // Handle any hotkey trigger (F10 or custom hotkey)
-    if (payload.length > 0) {
+  unlistenShortcut = await listen<{ shortcut: string }>("tauri://global-shortcut", async (event) => {
+    // Check if it's F10 hotkey
+    if (event.payload?.shortcut === "F10") {
       const window = getCurrentWindow();
       if ((await window.isVisible())) {
         await window.hide();

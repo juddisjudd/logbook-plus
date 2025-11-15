@@ -1,4 +1,4 @@
-use tauri_plugin_global_shortcut::GlobalShortcutExt;
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 use tauri_plugin_updater::UpdaterExt;
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::{Manager, Emitter};
@@ -86,6 +86,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![register_hotkey, get_hotkey, check_for_updates, install_update])
         .setup(|app| {
+            // Register global shortcut - F10 will toggle window visibility
             let _ = app.global_shortcut().register("F10");
 
             // Create tray menu
