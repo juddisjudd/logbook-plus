@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import SearchInput from "../SearchInput.vue";
 import { useQuests } from "../../composables/useQuests";
 
 const { getAllQuests, getQuestTracker, updateQuestTracker } = useQuests();
@@ -68,10 +69,8 @@ const toggleQuestCompletion = (questId: string) => {
   <div class="quest-tracker">
     <div class="quest-list">
       <div class="quest-controls">
-        <input
+        <SearchInput
           v-model="searchQuery"
-          type="text"
-          class="quest-search"
           placeholder="Search quests..."
         />
         <label class="filter-toggle">
@@ -181,26 +180,6 @@ const toggleQuestCompletion = (questId: string) => {
   padding: 8px 12px;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-bg-secondary);
-}
-
-.quest-search {
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-primary);
-  padding: 6px 8px;
-  font-size: 11px;
-  font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  border-radius: 2px;
-  transition: border-color 0.2s;
-}
-
-.quest-search::placeholder {
-  color: var(--color-text-secondary);
-}
-
-.quest-search:focus {
-  outline: none;
-  border-color: var(--color-accent);
 }
 
 .filter-toggle {
