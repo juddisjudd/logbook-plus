@@ -124,11 +124,14 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![register_hotkey, get_hotkey, init_hotkey, check_for_updates, install_update])
         .setup(|app| {
             // Register the default hotkey
-            let default_hotkey = "f10";
+            let default_hotkey = "F10";
+            let app_handle = app.app_handle().clone();
+
             match Shortcut::from_str(default_hotkey) {
                 Ok(shortcut) => {
-                    if let Err(e) = app.global_shortcut().register(shortcut) {
-                        eprintln!("Failed to register default hotkey: {}", e);
+                    match app.global_shortcut().register(shortcut) {
+                        Ok(_) => println!("Successfully registered hotkey: {}", default_hotkey),
+                        Err(e) => eprintln!("Failed to register default hotkey: {}", e),
                     }
                 }
                 Err(e) => {
@@ -136,17 +139,24 @@ pub fn run() {
                 }
             }
 
-            // Set up global shortcut listener
-            let app_handle = app.app_handle().clone();
+            // Set up a listener on the window for shortcut events
+            // The global shortcut plugin emits events to the window
             if let Some(window) = app.get_webview_window("main") {
-                let app_handle_clone = app_handle.clone();
-                window.listen("tauri://global-shortcut", move |_event| {
-                    if let Some(main_window) = app_handle_clone.get_webview_window("main") {
-                        if let Ok(is_visible) = main_window.is_visible() {
+                let app_handle_for_shortcut = app_handle.clone();
+                window.listen("tauri://global-shortcut", move |event| {
+                    // Parse the event payload to get the shortcut that was triggered
+                    println!("Received shortcut event: {:?}", event.payload());
+
+                    if let Some(w) = app_handle_for_shortcut.get_webview_window("main") {
+                        if let Ok(is_visible) = w.is_visible() {
                             let _ = if is_visible {
-                                main_window.hide()
+                                println!("Hotkey pressed: Hiding window");
+                                w.hide()
                             } else {
-                                main_window.show().and_then(|_| main_window.set_focus())
+                                println!("Hotkey pressed: Showing window");
+                                let _ = w.show();
+                                let _ = w.set_focus();
+                                Ok(())
                             };
                         }
                     }
