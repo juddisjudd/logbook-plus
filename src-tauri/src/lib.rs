@@ -98,7 +98,9 @@ pub fn run() {
                 .items(&[&toggle_item, &settings_item, &quit_item])
                 .build()?;
 
-            tauri::tray::TrayIconBuilder::new()
+            // Build tray with menu
+            // Note: Custom tray icon will be loaded automatically from bundle config if available
+            let tray = tauri::tray::TrayIconBuilder::new()
                 .menu(&menu)
                 .on_menu_event(|app, event| {
                     match event.id().as_ref() {
@@ -128,6 +130,9 @@ pub fn run() {
                     }
                 })
                 .build(app)?;
+
+            // Keep tray reference alive (tray will be cleaned up when app closes)
+            std::mem::forget(tray);
 
             Ok(())
         })
