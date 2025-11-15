@@ -1,14 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bun run build)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(find:*)",
-      "Bash(cargo build:*)",
-      "Bash(cargo check:*)",
-      "Bash(cargo clean:*)",
-      "Read(//s/_projects_/_arc-raiders_/arcraiders-data/quests/**)"
+      "Bash(npx vue-tsc:*)",
+      "Bash(test:*)",
+      "Bash(do if ! grep -q '\"\"en\"\"' \"$f\")",
+      "Bash(then echo \"Missing ''en'' in $f\")",
+      "Bash(fi)",
+      "Bash(do grep -q '\"\"name\"\"' \"$f\")",
+      "Bash(echo:*)",
+      "Bash(do if ! grep -q '\"\"description\"\"' \"$f\")",
+      "Bash(then echo \"Missing description in: $f\")"
     ],
     "deny": [],
     "ask": []

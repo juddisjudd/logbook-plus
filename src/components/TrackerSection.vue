@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import QuestTracker from "./trackers/QuestTracker.vue";
+import HideoutTracker from "./trackers/HideoutTracker.vue";
+import BlueprintTracker from "./trackers/BlueprintTracker.vue";
 
 defineProps<{
   id: string;
   title: string;
 }>();
 
-const isExpanded = ref(true);
+const isExpanded = ref(false);
 const toggleExpanded = () => {
   isExpanded.value = !isExpanded.value;
 };
@@ -22,6 +24,15 @@ const toggleExpanded = () => {
 
     <div v-if="isExpanded" class="section-content">
       <QuestTracker v-if="id === 'quests'" />
+      <HideoutTracker v-else-if="id === 'hideout'" />
+      <Suspense v-else-if="id === 'blueprints'">
+        <template #default>
+          <BlueprintTracker />
+        </template>
+        <template #fallback>
+          <div class="placeholder">Loading blueprints...</div>
+        </template>
+      </Suspense>
       <p v-else class="placeholder">{{ title }} tracker data will appear here</p>
     </div>
   </section>
@@ -72,7 +83,8 @@ const toggleExpanded = () => {
   padding: 0;
   background: var(--color-bg-primary);
   max-height: 300px;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
 }
