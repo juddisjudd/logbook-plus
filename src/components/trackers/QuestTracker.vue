@@ -37,7 +37,8 @@ const quests = computed(() => {
 
 const selectedQuest = computed(() => {
   if (!selectedQuestId.value) return null;
-  return quests.value.find((q) => q.id === selectedQuestId.value);
+  // Get from all quests, not filtered list, so it stays visible even if completion status changes
+  return getAllQuests().find((q) => q.id === selectedQuestId.value);
 });
 
 const questTracker = computed(() => {
