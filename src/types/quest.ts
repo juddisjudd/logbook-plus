@@ -28,6 +28,7 @@ export interface QuestTracker {
   questId: string;
   isCompleted: boolean;
   objectivesCompleted: boolean[];
+  isFavorite: boolean;
   startedAt?: number;
   completedAt?: number;
 }

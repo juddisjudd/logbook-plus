@@ -3,7 +3,7 @@ import { computed, ref, watch } from "vue";
 import SearchInput from "../SearchInput.vue";
 import { useQuests } from "../../composables/useQuests";
 
-const { getAllQuests, getQuestTracker, updateQuestTracker, toggleObjectiveCompletion, getObjectiveStatus } = useQuests();
+const { getAllQuests, getQuestTracker, updateQuestTracker, toggleObjectiveCompletion, getObjectiveStatus, toggleQuestFavorite } = useQuests();
 const selectedQuestId = ref<string | null>(null);
 const searchQuery = ref("");
 
@@ -24,8 +24,15 @@ const quests = computed(() => {
     });
   }
 
-  // Sort: active quests first, then completed
+  // Sort: favorites first, then active quests, then completed
   filtered.sort((a, b) => {
+    const aFavorite = getQuestTracker(a.id)?.isFavorite ?? false;
+    const bFavorite = getQuestTracker(b.id)?.isFavorite ?? false;
+
+    // If one is favorite and other isn't, favorite comes first
+    if (aFavorite !== bFavorite) return bFavorite ? 1 : -1;
+
+    // If both have same favorite status, sort by completion
     const aCompleted = getQuestTracker(a.id)?.isCompleted ?? false;
     const bCompleted = getQuestTracker(b.id)?.isCompleted ?? false;
     if (aCompleted === bCompleted) return 0;
@@ -76,22 +83,37 @@ const toggleQuestCompletion = (questId: string) => {
         </div>
 
         <div v-else class="quest-items">
-        <button
+        <div
           v-for="quest in quests"
           :key="quest.id"
-          class="quest-item"
-          :class="{
-            active: selectedQuestId === quest.id,
-            completed: getQuestTracker(quest.id)?.isCompleted
-          }"
-          @click="selectedQuestId = quest.id"
+          class="quest-item-wrapper"
+          :class="{ favorited: getQuestTracker(quest.id)?.isFavorite }"
         >
-          <div class="quest-item-header">
-            <span class="quest-name">{{ getLocalizedText(quest.name) }}</span>
-            <span class="quest-trader">{{ quest.trader }}</span>
-          </div>
-          <span v-if="getQuestTracker(quest.id)?.isCompleted" class="completed-badge">✓</span>
-        </button>
+          <button
+            class="quest-item"
+            :class="{
+              active: selectedQuestId === quest.id,
+              completed: getQuestTracker(quest.id)?.isCompleted
+            }"
+            @click="selectedQuestId = quest.id"
+          >
+            <div class="quest-item-header">
+              <span class="quest-name">{{ getLocalizedText(quest.name) }}</span>
+              <span class="quest-trader">{{ quest.trader }}</span>
+            </div>
+            <div class="quest-item-actions">
+              <button
+                class="favorite-btn"
+                :class="{ active: getQuestTracker(quest.id)?.isFavorite }"
+                @click.stop="toggleQuestFavorite(quest.id)"
+                title="Favorite this quest"
+              >
+                ★
+              </button>
+              <span v-if="getQuestTracker(quest.id)?.isCompleted" class="completed-badge">✓</span>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -217,10 +239,18 @@ const toggleQuestCompletion = (questId: string) => {
   flex-direction: column;
 }
 
+.quest-item-wrapper {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.quest-item-wrapper.favorited {
+  background: rgba(242, 164, 19, 0.08);
+}
+
 .quest-item {
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--color-border);
   padding: 10px 12px;
   text-align: left;
   cursor: pointer;
@@ -228,6 +258,8 @@ const toggleQuestCompletion = (questId: string) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .quest-item:hover {
@@ -272,11 +304,39 @@ const toggleQuestCompletion = (questId: string) => {
   color: var(--color-text-secondary);
 }
 
+.quest-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.favorite-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+  transition: all 0.2s;
+  opacity: 0.5;
+}
+
+.favorite-btn:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+
+.favorite-btn.active {
+  color: var(--color-accent);
+  opacity: 1;
+}
+
 .completed-badge {
   color: #4da6ff;
   font-size: 14px;
   font-weight: bold;
-  margin-left: 8px;
 }
 
 .detail-content {

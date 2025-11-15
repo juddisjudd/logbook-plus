@@ -67,12 +67,20 @@ export function useQuests() {
       questId,
       isCompleted: false,
       objectivesCompleted: [],
+      isFavorite: false,
     };
 
     questTrackers.value.set(questId, {
       ...existing,
       ...tracker,
     });
+  };
+
+  // Toggle quest favorite status
+  const toggleQuestFavorite = (questId: string) => {
+    const tracker = getQuestTracker(questId);
+    const isFavorite = tracker?.isFavorite ?? false;
+    updateQuestTracker(questId, { isFavorite: !isFavorite });
   };
 
   // Get quest tracker
@@ -130,6 +138,7 @@ export function useQuests() {
     getQuestTracker,
     toggleObjectiveCompletion,
     getObjectiveStatus,
+    toggleQuestFavorite,
     activeQuests,
     completedQuests,
   };
