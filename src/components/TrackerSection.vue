@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import QuestTracker from "./trackers/QuestTracker.vue";
 
 defineProps<{
+  id: string;
   title: string;
 }>();
 
@@ -19,7 +21,8 @@ const toggleExpanded = () => {
     </div>
 
     <div v-if="isExpanded" class="section-content">
-      <p class="placeholder">{{ title }} tracker data will appear here</p>
+      <QuestTracker v-if="id === 'quests'" />
+      <p v-else class="placeholder">{{ title }} tracker data will appear here</p>
     </div>
   </section>
 </template>
@@ -28,6 +31,7 @@ const toggleExpanded = () => {
 .tracker-section {
   border-bottom: 1px solid var(--color-border);
   background: var(--color-bg-primary);
+  flex: 0 0 auto;
 }
 
 .section-header {
@@ -65,8 +69,12 @@ const toggleExpanded = () => {
 }
 
 .section-content {
-  padding: 12px;
+  padding: 0;
   background: var(--color-bg-primary);
+  max-height: 300px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .placeholder {
@@ -74,5 +82,6 @@ const toggleExpanded = () => {
   color: var(--color-text-secondary);
   margin: 0;
   text-align: center;
+  padding: 12px;
 }
 </style>

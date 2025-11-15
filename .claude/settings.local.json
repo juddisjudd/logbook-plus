@@ -6,7 +6,9 @@
       "Bash(git commit:*)",
       "Bash(find:*)",
       "Bash(cargo build:*)",
-      "Bash(cargo check:*)"
+      "Bash(cargo check:*)",
+      "Bash(cargo clean:*)",
+      "Read(//s/_projects_/_arc-raiders_/arcraiders-data/quests/**)"
     ],
     "deny": [],
     "ask": []

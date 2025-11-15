@@ -62,6 +62,7 @@ const handleSettingsToggle = () => {
       <TrackerSection
         v-for="tracker in trackers"
         :key="tracker.id"
+        :id="tracker.id"
         :title="tracker.title"
       />
     </div>
