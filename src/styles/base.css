@@ -1,5 +1,23 @@
 /* Logbook+ Base Styles - Arc Raiders Aesthetic */
 
+@font-face {
+  font-family: "Barlow";
+  src: url("/src/assets/fonts/Barlow/Barlow-Regular.ttf") format("truetype");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Barlow";
+  src: url("/src/assets/fonts/Barlow/Barlow-Medium.ttf") format("truetype");
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Barlow";
+  src: url("/src/assets/fonts/Barlow/Barlow-Bold.ttf") format("truetype");
+  font-weight: 700;
+}
+
 :root {
   /* Color Palette */
   --color-bg-primary: #1a1a1a;
@@ -12,7 +30,7 @@
   --color-accent-dark: #2d5a99;
 
   /* Typography */
-  font-family: "Courier New", monospace;
+  font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 13px;
   line-height: 1.4;
   color: var(--color-text-primary);

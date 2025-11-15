@@ -7,7 +7,7 @@ The UI must feel native to **Arc Raiders**: industrial, clean, slightly retro-fu
 ## Key Traits
 
 * **Color Palette**: muted neutrals, desaturated metallics, with sparse accent colors for highlights.
-* **Typography**: condensed, high-legibility, HUD‑like fonts.
+* **Typography**: **Barlow** font family (Regular 400, Medium 500, Bold 700) for condensed, high-legibility, HUD‑like appearance. Fallback to system sans-serif if unavailable.
 * **Spacing**: compact but readable; avoid crowded grids.
 * **Shapes**: rectangular panels with subtle bevels or inner shadows.
 * **Effects**: light scanlines, matte gradients, and minimal glows.
