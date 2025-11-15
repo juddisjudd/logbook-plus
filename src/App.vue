@@ -13,6 +13,7 @@ const appVersion = import.meta.env.PACKAGE_VERSION || "0.1.0";
 const trackers = [
   { id: "quests", title: "QUESTS" },
   { id: "hideout", title: "HIDEOUT" },
+  { id: "projects", title: "PROJECTS" },
   { id: "blueprints", title: "BLUEPRINTS" },
   { id: "items", title: "ITEM LIST" },
 ];
