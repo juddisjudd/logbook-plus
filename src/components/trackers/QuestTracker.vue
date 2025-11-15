@@ -5,19 +5,39 @@ import { useQuests } from "../../composables/useQuests";
 const { getAllQuests, getQuestTracker, updateQuestTracker } = useQuests();
 const selectedQuestId = ref<string | null>(null);
 const filterCompleted = ref(false);
+const searchQuery = ref("");
+
+const getLocalizedText = (localized: Record<string, string>) => {
+  return localized.en || Object.values(localized)[0] || "";
+};
 
 const quests = computed(() => {
-  const allQuests = getAllQuests();
+  let filtered = getAllQuests();
+
+  // Filter by completion status
   if (filterCompleted.value) {
-    return allQuests.filter((quest) => {
+    filtered = filtered.filter((quest) => {
       const tracker = getQuestTracker(quest.id);
       return tracker?.isCompleted;
     });
+  } else {
+    filtered = filtered.filter((quest) => {
+      const tracker = getQuestTracker(quest.id);
+      return !tracker?.isCompleted;
+    });
   }
-  return allQuests.filter((quest) => {
-    const tracker = getQuestTracker(quest.id);
-    return !tracker?.isCompleted;
-  });
+
+  // Filter by search query
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim();
+    filtered = filtered.filter((quest) => {
+      const questName = getLocalizedText(quest.name).toLowerCase();
+      const traderName = quest.trader.toLowerCase();
+      return questName.includes(query) || traderName.includes(query);
+    });
+  }
+
+  return filtered;
 });
 
 const selectedQuest = computed(() => {
@@ -42,16 +62,18 @@ const toggleQuestCompletion = (questId: string) => {
   const isCompleted = tracker?.isCompleted ?? false;
   updateQuestTracker(questId, { isCompleted: !isCompleted });
 };
-
-const getLocalizedText = (localized: Record<string, string>) => {
-  return localized.en || Object.values(localized)[0] || "";
-};
 </script>
 
 <template>
   <div class="quest-tracker">
     <div class="quest-list">
-      <div class="quest-filter">
+      <div class="quest-controls">
+        <input
+          v-model="searchQuery"
+          type="text"
+          class="quest-search"
+          placeholder="Search quests..."
+        />
         <label class="filter-toggle">
           <input
             v-model="filterCompleted"
@@ -152,10 +174,33 @@ const getLocalizedText = (localized: Record<string, string>) => {
   overflow-y: auto;
 }
 
-.quest-filter {
-  padding: 10px 12px;
+.quest-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-bg-secondary);
+}
+
+.quest-search {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  padding: 6px 8px;
+  font-size: 11px;
+  font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  border-radius: 2px;
+  transition: border-color 0.2s;
+}
+
+.quest-search::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.quest-search:focus {
+  outline: none;
+  border-color: var(--color-accent);
 }
 
 .filter-toggle {
