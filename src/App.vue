@@ -13,6 +13,7 @@ import UpdateNotification from "./components/UpdateNotification.vue";
 const showSettings = ref(false);
 const showCheatsheet = ref(false);
 const appVersion = import.meta.env.PACKAGE_VERSION || "0.1.0";
+const expandedSectionId = ref<string | null>(null);
 
 // Initialize opacity on mount
 useOpacity();
@@ -54,6 +55,16 @@ const handleCheatsheetToggle = () => {
   showCheatsheet.value = !showCheatsheet.value;
   showSettings.value = false;
 };
+
+const handleSectionToggle = (sectionId: string) => {
+  if (expandedSectionId.value === sectionId) {
+    // Toggle off if same section clicked
+    expandedSectionId.value = null;
+  } else {
+    // Expand new section and collapse others
+    expandedSectionId.value = sectionId;
+  }
+};
 </script>
 
 <template>
@@ -75,6 +86,8 @@ const handleCheatsheetToggle = () => {
           :key="tracker.id"
           :id="tracker.id"
           :title="tracker.title"
+          :is-expanded="expandedSectionId === tracker.id"
+          @toggle="handleSectionToggle(tracker.id)"
         />
       </div>
     </div>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import LootFocuser from "./trackers/LootFocuser.vue";
 import QuestTracker from "./trackers/QuestTracker.vue";
 import HideoutTracker from "./trackers/HideoutTracker.vue";
@@ -7,25 +6,29 @@ import ProjectTracker from "./trackers/ProjectTracker.vue";
 import BlueprintTracker from "./trackers/BlueprintTracker.vue";
 import ItemTracker from "./trackers/ItemTracker.vue";
 
-defineProps<{
+const props = defineProps<{
   id: string;
   title: string;
+  isExpanded: boolean;
 }>();
 
-const isExpanded = ref(false);
+const emit = defineEmits<{
+  toggle: [];
+}>();
+
 const toggleExpanded = () => {
-  isExpanded.value = !isExpanded.value;
+  emit("toggle");
 };
 </script>
 
 <template>
-  <section class="tracker-section">
+  <section class="tracker-section" :class="{ expanded: props.isExpanded }">
     <div class="section-header" @click="toggleExpanded">
-      <span class="toggle-indicator">{{ isExpanded ? "▼" : "▶" }}</span>
-      <h2 class="section-title">{{ title }}</h2>
+      <span class="toggle-indicator">{{ props.isExpanded ? "▼" : "▶" }}</span>
+      <h2 class="section-title">{{ props.title }}</h2>
     </div>
 
-    <div v-if="isExpanded" class="section-content">
+    <div v-if="props.isExpanded" class="section-content">
       <LootFocuser v-if="id === 'loot-focuser'" />
       <QuestTracker v-else-if="id === 'quests'" />
       <HideoutTracker v-else-if="id === 'hideout'" />
@@ -56,6 +59,11 @@ const toggleExpanded = () => {
   border-bottom: 1px solid var(--color-border);
   background: var(--color-bg-primary);
   flex: 0 0 auto;
+  transition: flex 0.3s ease;
+}
+
+.tracker-section.expanded {
+  flex: 1 1 auto;
 }
 
 .section-header {
@@ -95,11 +103,12 @@ const toggleExpanded = () => {
 .section-content {
   padding: 0;
   background: var(--color-bg-primary);
-  max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .placeholder {
