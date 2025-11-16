@@ -18,16 +18,22 @@ const allItems = computed(() => getAllItems());
 const filteredItems = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
 
-  if (!query) {
-    return allItems.value.sort((a, b) => a.name.en.localeCompare(b.name.en));
-  }
+  // Filter items, ensuring they have valid names
+  let items = allItems.value.filter((item) => item?.name?.en);
 
-  return allItems.value
-    .filter((item) =>
+  if (query) {
+    items = items.filter((item) =>
       item.name.en.toLowerCase().includes(query) ||
       item.id.toLowerCase().includes(query)
-    )
-    .sort((a, b) => a.name.en.localeCompare(b.name.en));
+    );
+  }
+
+  // Sort by name
+  return items.sort((a, b) => {
+    const nameA = a.name?.en || '';
+    const nameB = b.name?.en || '';
+    return nameA.localeCompare(nameB);
+  });
 });
 
 // Get focused items as array
