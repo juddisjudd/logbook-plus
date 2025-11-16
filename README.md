@@ -7,10 +7,14 @@ A lightweight overlay application for <a href="https://www.arcraiders.com/">Arc 
 
 ## Features
 
+- **Loot Focuser** - Create personalized loot lists by searching and adding items you want to focus on collecting
 - **Quest Tracker** - Search and track quests by name, mark objectives as complete
 - **Hideout Tracker** - Track your hideout facility upgrades and level progression
-- **Blueprint Tracker** - Keep track of collected blueprints for 40+ different items
 - **Project Tracker** - Track progress of your project phases
+- **Blueprint Tracker** - Keep track of collected blueprints for 40+ different items
+- **Item Tracker** - Browse and track all items with images and rarities
+- **Cheatsheet** - Quick reference guide showing all items needed for hideout and projects
+- **Window Opacity** - Adjust overlay transparency to see the game behind it
 - **Auto-Update** - Get notified of new versions automatically
 
 ## Getting Started
