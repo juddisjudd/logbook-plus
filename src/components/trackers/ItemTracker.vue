@@ -5,7 +5,7 @@ import ItemImage from "../ItemImage.vue";
 import ItemHoverCard from "../ItemHoverCard.vue";
 import { useItems } from "../../composables/useItems";
 
-const { getAllItems, getItemTracker, toggleItemCollection } = useItems();
+const { getAllItems } = useItems();
 const searchQuery = ref("");
 const hoveredItemId = ref<string | null>(null);
 const hoverPosition = ref<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -40,14 +40,6 @@ const items = computed(() => {
   return filtered;
 });
 
-const collectedCount = computed(() => {
-  return getAllItems().filter((i) => getItemTracker(i.id).isCollected).length;
-});
-
-const handleToggleCollection = (itemId: string) => {
-  toggleItemCollection(itemId);
-};
-
 const handleMouseEnter = (itemId: string, event: MouseEvent) => {
   hoveredItemId.value = itemId;
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
@@ -65,10 +57,6 @@ const handleMouseLeave = () => {
 <template>
   <div class="item-tracker">
     <div class="item-controls">
-      <div class="stats">
-        <span class="stat-label">Collected:</span>
-        <span class="stat-value">{{ collectedCount }}/{{ getAllItems().length }}</span>
-      </div>
       <SearchInput
         v-model="searchQuery"
         placeholder="Search items..."
@@ -89,7 +77,6 @@ const handleMouseLeave = () => {
         v-for="item in items"
         :key="item.id"
         class="item-card"
-        :class="{ collected: getItemTracker(item.id).isCollected }"
         @mouseenter="handleMouseEnter(item.id, $event)"
         @mouseleave="handleMouseLeave"
       >
@@ -104,29 +91,22 @@ const handleMouseLeave = () => {
           <h3 class="item-name">{{ getLocalizedText(item.name) }}</h3>
           <p class="item-description">{{ getLocalizedText(item.description) }}</p>
         </div>
-        <button
-          class="collect-button"
-          :class="{ collected: getItemTracker(item.id).isCollected }"
-          @click="handleToggleCollection(item.id)"
-        >
-          {{ getItemTracker(item.id).isCollected ? "✓" : "○" }}
-        </button>
       </div>
+    </div>
 
-      <!-- Hover Card Portal -->
-      <div
-        v-if="hoveredItemId"
-        class="hover-card-container"
-        :style="{
-          position: 'fixed',
-          left: hoverPosition.x + 'px',
-          top: hoverPosition.y + 'px',
-          pointerEvents: 'none',
-          zIndex: 1000
-        }"
-      >
-        <ItemHoverCard :item="items.find(i => i.id === hoveredItemId)!" />
-      </div>
+    <!-- Hover Card Portal - Outside item-list to prevent clipping -->
+    <div
+      v-if="hoveredItemId"
+      class="hover-card-container"
+      :style="{
+        position: 'fixed',
+        left: hoverPosition.x + 'px',
+        top: hoverPosition.y + 'px',
+        pointerEvents: 'none',
+        zIndex: 1000
+      }"
+    >
+      <ItemHoverCard :item="items.find(i => i.id === hoveredItemId)!" />
     </div>
   </div>
 </template>
@@ -188,25 +168,18 @@ const handleMouseLeave = () => {
 
 .item-card {
   display: grid;
-  grid-template-columns: 64px 1fr 32px;
+  grid-template-columns: 64px 1fr;
   gap: 12px;
   align-items: center;
   border-bottom: 1px solid var(--color-border);
   padding: 10px 12px;
   background: var(--color-bg-primary);
   transition: background 0.2s;
+  cursor: pointer;
 }
 
 .item-card:hover {
   background: var(--color-bg-secondary);
-}
-
-.item-card.collected {
-  opacity: 0.6;
-}
-
-.item-card.collected .item-name {
-  text-decoration: line-through;
 }
 
 .item-visual {
@@ -243,39 +216,10 @@ const handleMouseLeave = () => {
   white-space: nowrap;
 }
 
-.collect-button {
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 2px;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.collect-button:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-}
-
-.collect-button.collected {
-  background: var(--color-accent);
-  color: var(--color-bg-primary);
-  border-color: var(--color-accent);
-}
-
 /* Responsive adjustments */
 @media (max-width: 700px) {
   .item-card {
-    grid-template-columns: 48px 1fr 28px;
+    grid-template-columns: 48px 1fr;
   }
 
   .item-name {
