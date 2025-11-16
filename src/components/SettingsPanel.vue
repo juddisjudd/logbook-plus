@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+import { useOpacity } from "../composables/useOpacity";
 
 const hotkeyDisplay = ref("");
 const hotkeyStatus = ref("");
 const isCapturing = ref(false);
 const isSaving = ref(false);
 let capturedHotkey = "";
+
+const { opacity } = useOpacity();
 
 onMounted(async () => {
   // Load the current hotkey from localStorage or use default
@@ -203,6 +206,24 @@ const resetToDefault = async () => {
             Press the hotkey to toggle the Logbook+ window visibility (minimize to tray).
           </p>
         </div>
+
+        <div class="setting-item">
+          <label class="setting-label">App Opacity</label>
+          <div class="opacity-control">
+            <input
+              v-model.number="opacity"
+              type="range"
+              min="0.1"
+              max="1"
+              step="0.05"
+              class="opacity-slider"
+            />
+            <div class="opacity-value">{{ Math.round(opacity * 100) }}%</div>
+          </div>
+          <p class="setting-hint">
+            Adjust the transparency of the entire application window.
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -378,5 +399,74 @@ const resetToDefault = async () => {
 
 .status-message.error {
   color: #ff6b6b;
+}
+
+.opacity-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.opacity-slider {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.opacity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.opacity-slider::-webkit-slider-thumb:hover {
+  background: var(--color-accent-dark);
+}
+
+.opacity-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.opacity-slider::-moz-range-thumb:hover {
+  background: var(--color-accent-dark);
+}
+
+.opacity-slider::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
+.opacity-slider::-moz-range-progress {
+  background: var(--color-accent);
+  border-radius: 3px;
+  height: 6px;
+}
+
+.opacity-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  min-width: 35px;
+  text-align: right;
 }
 </style>
