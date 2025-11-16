@@ -124,7 +124,11 @@ const getLocalizedText = (record: Record<string, string> | undefined): string =>
         class="search-input"
       />
 
-      <div v-if="searchQuery && filteredItems.length === 0" class="no-results">
+      <div v-if="!searchQuery" class="empty-search">
+        <p>Start typing to search for items...</p>
+      </div>
+
+      <div v-else-if="filteredItems.length === 0" class="no-results">
         No items found matching "{{ searchQuery }}"
       </div>
 
@@ -336,6 +340,17 @@ const getLocalizedText = (record: Record<string, string> | undefined): string =>
 
 .search-input::placeholder {
   color: var(--color-text-secondary);
+}
+
+.empty-search {
+  padding: 12px;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.empty-search p {
+  margin: 0;
 }
 
 .no-results {
