@@ -97,19 +97,22 @@ const handleMouseLeave = () => {
       </div>
     </div>
 
-    <!-- Hover Card Portal - Outside item-list to prevent clipping -->
-    <div
-      v-if="hoveredItemId"
-      class="hover-card-container"
-      :style="{
-        position: 'absolute',
-        left: hoverPosition.x + 'px',
-        top: hoverPosition.y + 'px',
-        pointerEvents: 'none'
-      }"
-    >
-      <ItemHoverCard :item="items.find(i => i.id === hoveredItemId)!" />
-    </div>
+    <!-- Hover Card Portal - Teleport to body to escape overflow containers -->
+    <Teleport to="body">
+      <div
+        v-if="hoveredItemId"
+        class="hover-card-container"
+        :style="{
+          position: 'fixed',
+          left: hoverPosition.x + 'px',
+          top: hoverPosition.y + 'px',
+          pointerEvents: 'none',
+          zIndex: 10000
+        }"
+      >
+        <ItemHoverCard :item="items.find(i => i.id === hoveredItemId)!" />
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -120,7 +123,6 @@ const handleMouseLeave = () => {
   height: 100%;
   gap: 0;
   overflow: hidden;
-  position: relative;
 }
 
 .item-controls {
