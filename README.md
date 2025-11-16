@@ -1,12 +1,14 @@
-# Logbook+ - Arc Raiders Overlay
-
-A lightweight overlay application for the [Arc Raiders](https://www.arcraiders.com/) game. Track quests, hideout progression, and blueprints while you play with a sleek, always-on-top interface that stays out of your way.
+<img width="1200" height="180" alt="logbook+" src="https://github.com/user-attachments/assets/5abd6e0f-f43f-4adc-b109-890c31520002" />
+<div align="center">
+A lightweight overlay application for <a href="https://www.arcraiders.com/">Arc Raiders</a>.<br> Track quests, hideout progression, projects, and blueprints in a more convenient way.
+</div>
 
 ## Features
 
 - **Quest Tracker** - Search and track quests by name, mark objectives as complete
-- **Hideout Tracker** - Monitor your hideout facility upgrades and level progression
+- **Hideout Tracker** - Track your hideout facility upgrades and level progression
 - **Blueprint Tracker** - Keep track of collected blueprints for 40+ different items
+- **Project Tracker** - Track progress of your project phases
 - **Auto-Update** - Get notified of new versions automatically
 
 ## Getting Started
@@ -22,17 +24,6 @@ A lightweight overlay application for the [Arc Raiders](https://www.arcraiders.c
 - **Show/Hide**: Press **F10** at any time to toggle the overlay
 - **Access Settings**: Click the ⚙ icon in the top-right corner
 - **System Tray**: Right-click the system tray icon for quick access to settings and toggle
-
-### Customizing Your Hotkey
-
-1. Click the ⚙ icon in the header
-2. Click the **Hotkey** input field
-3. Press the key combination you want to use
-4. Your new hotkey will be saved automatically
-
-Supported formats:
-- Single keys: `F10`, `F1`-`F24`
-- Combinations: `Ctrl+Shift+L`, `Alt+K`, `Ctrl+Alt+M`
 
 ## Data & Credits
 
