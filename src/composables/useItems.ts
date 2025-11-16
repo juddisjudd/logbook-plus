@@ -1,5 +1,6 @@
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import type { Item, ItemTracker } from "../types/item";
+import { saveToStorage, loadFromStorage, serializeMap, deserializeMap } from "../utils/storage";
 
 // Import only item files (non-blueprints)
 const itemModules = import.meta.glob<{ default: Item }>(
@@ -34,6 +35,12 @@ export function useItems() {
     }
 
     items.value = itemMap;
+  };
+
+  // Load item trackers from localStorage
+  const loadItemTrackers = () => {
+    const saved = loadFromStorage<Array<[string, ItemTracker]>>("item_trackers", []);
+    itemTrackers.value = deserializeMap(saved);
   };
 
   // Get item by ID
@@ -74,11 +81,22 @@ export function useItems() {
 
   // Initialize on first use
   loadItems();
+  loadItemTrackers();
+
+  // Watch for changes to item trackers and save to localStorage
+  watch(
+    () => serializeMap(itemTrackers.value),
+    (newValue) => {
+      saveToStorage("item_trackers", newValue);
+    },
+    { deep: true }
+  );
 
   return {
     items,
     itemTrackers,
     loadItems,
+    loadItemTrackers,
     getItem,
     getAllItems,
     getItemTracker,

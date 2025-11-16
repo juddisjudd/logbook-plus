@@ -1,5 +1,6 @@
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import type { Hideout, HideoutTracker } from "../types/hideout";
+import { saveToStorage, loadFromStorage, serializeMap, deserializeMap } from "../utils/storage";
 
 // Import all hideout files
 const hideoutModules = import.meta.glob<{ default: Hideout }>(
@@ -21,6 +22,12 @@ export function useHideout() {
     });
 
     hideouts.value = hideoutMap;
+  };
+
+  // Load hideout trackers from localStorage
+  const loadHideoutTrackers = () => {
+    const saved = loadFromStorage<Array<[string, HideoutTracker]>>("hideout_trackers", []);
+    hideoutTrackers.value = deserializeMap(saved);
   };
 
   // Get hideout by ID
@@ -92,11 +99,22 @@ export function useHideout() {
 
   // Initialize on first use
   loadHideouts();
+  loadHideoutTrackers();
+
+  // Watch for changes to hideout trackers and save to localStorage
+  watch(
+    () => serializeMap(hideoutTrackers.value),
+    (newValue) => {
+      saveToStorage("hideout_trackers", newValue);
+    },
+    { deep: true }
+  );
 
   return {
     hideouts,
     hideoutTrackers,
     loadHideouts,
+    loadHideoutTrackers,
     getHideout,
     getAllHideouts,
     getHideoutTracker,

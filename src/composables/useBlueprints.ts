@@ -1,5 +1,6 @@
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import type { Blueprint, BlueprintTracker } from "../types/blueprint";
+import { saveToStorage, loadFromStorage, serializeMap, deserializeMap } from "../utils/storage";
 
 // Import only blueprint files
 const blueprintModules = import.meta.glob<{ default: Blueprint }>(
@@ -34,6 +35,12 @@ export function useBlueprints() {
     }
 
     blueprints.value = blueprintMap;
+  };
+
+  // Load blueprint trackers from localStorage
+  const loadBlueprintTrackers = () => {
+    const saved = loadFromStorage<Array<[string, BlueprintTracker]>>("blueprint_trackers", []);
+    blueprintTrackers.value = deserializeMap(saved);
   };
 
   // Get blueprint by ID
@@ -74,11 +81,22 @@ export function useBlueprints() {
 
   // Initialize on first use
   loadBlueprints();
+  loadBlueprintTrackers();
+
+  // Watch for changes to blueprint trackers and save to localStorage
+  watch(
+    () => serializeMap(blueprintTrackers.value),
+    (newValue) => {
+      saveToStorage("blueprint_trackers", newValue);
+    },
+    { deep: true }
+  );
 
   return {
     blueprints,
     blueprintTrackers,
     loadBlueprints,
+    loadBlueprintTrackers,
     getBlueprint,
     getAllBlueprints,
     getBlueprintTracker,

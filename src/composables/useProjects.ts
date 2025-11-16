@@ -1,6 +1,7 @@
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import type { Project, ProjectProgress } from "../types/project";
 import projectsData from "../data/projects.json";
+import { saveToStorage, loadFromStorage, serializeMap, deserializeMap } from "../utils/storage";
 
 export function useProjects() {
   const projects = ref<Map<string, Project>>(new Map());
@@ -14,7 +15,7 @@ export function useProjects() {
       (projectsData as Project[]).forEach((project) => {
         if (project && project.id) {
           projectMap.set(project.id, project);
-          // Initialize progress tracking
+          // Initialize progress tracking only if not already loaded
           if (!projectProgress.value.has(project.id)) {
             projectProgress.value.set(project.id, {
               projectId: project.id,
@@ -29,6 +30,24 @@ export function useProjects() {
     }
 
     projects.value = projectMap;
+  };
+
+  // Load project progress from localStorage
+  const loadProjectProgress = () => {
+    const saved = loadFromStorage<Array<[string, ProjectProgress]>>("project_progress", []);
+    const loadedProgress = deserializeMap(saved);
+
+    // Merge with any uninitialized projects
+    projects.value.forEach((project) => {
+      if (!loadedProgress.has(project.id)) {
+        loadedProgress.set(project.id, {
+          projectId: project.id,
+          completedPhases: 0,
+        });
+      }
+    });
+
+    projectProgress.value = loadedProgress;
   };
 
   // Get project by ID
@@ -93,11 +112,22 @@ export function useProjects() {
 
   // Initialize on first use
   loadProjects();
+  loadProjectProgress();
+
+  // Watch for changes to project progress and save to localStorage
+  watch(
+    () => serializeMap(projectProgress.value),
+    (newValue) => {
+      saveToStorage("project_progress", newValue);
+    },
+    { deep: true }
+  );
 
   return {
     projects,
     projectProgress,
     loadProjects,
+    loadProjectProgress,
     getProject,
     getAllProjects,
     getProjectProgress,

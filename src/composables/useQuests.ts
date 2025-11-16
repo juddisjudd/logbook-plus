@@ -1,5 +1,6 @@
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import type { Quest, QuestTracker } from "../types/quest";
+import { saveToStorage, loadFromStorage, serializeMap, deserializeMap } from "../utils/storage";
 
 // Import all quest files
 const questModules = import.meta.glob<{ default: Quest }>(
@@ -22,6 +23,12 @@ export function useQuests() {
     });
 
     quests.value = questMap;
+  };
+
+  // Load quest trackers from localStorage
+  const loadQuestTrackers = () => {
+    const saved = loadFromStorage<Array<[string, QuestTracker]>>("quest_trackers", []);
+    questTrackers.value = deserializeMap(saved);
   };
 
   // Get quest by ID
@@ -123,12 +130,23 @@ export function useQuests() {
 
   // Initialize on first use
   loadQuests();
+  loadQuestTrackers();
+
+  // Watch for changes to quest trackers and save to localStorage
+  watch(
+    () => serializeMap(questTrackers.value),
+    (newValue) => {
+      saveToStorage("quest_trackers", newValue);
+    },
+    { deep: true }
+  );
 
   return {
     quests,
     questTrackers,
     selectedQuestId,
     loadQuests,
+    loadQuestTrackers,
     getQuest,
     getAllQuests,
     getQuestsByTrader,
