@@ -13,7 +13,7 @@ const openLink = async (url: string) => {
         <button
           class="footer-link"
           title="Open Logbook+ Repository"
-          @click="openLink('https://github.com/juddisjudd/logbook-overlay')"
+          @click="openLink('https://github.com/juddisjudd/logbook-plus')"
         >
           Logbook+
         </button>

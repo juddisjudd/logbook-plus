@@ -1,5 +1,5 @@
 [package]
-name = "logbook-overlay"
+name = "logbook-plus"
 version = "0.1.5"
 description = "A Tauri App"
 authors = ["you"]
