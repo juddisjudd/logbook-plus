@@ -208,6 +208,15 @@ const installUpdate = async () => {
     updateStatus.value = `Error: ${error}`;
   }
 };
+
+const openKoFi = async () => {
+  try {
+    const { openUrl } = await import("@tauri-apps/plugin-opener");
+    await openUrl("https://ko-fi.com/ohitsjudd");
+  } catch (error) {
+    console.error("Error opening Ko-fi link:", error);
+  }
+};
 </script>
 
 <template>
@@ -292,6 +301,19 @@ const installUpdate = async () => {
           </div>
           <p v-if="updateStatus" class="setting-hint" :class="{ 'update-available': updateStatus.includes('available') }">
             {{ updateStatus }}
+          </p>
+        </div>
+
+        <div class="setting-item">
+          <label class="setting-label">Support</label>
+          <button
+            class="support-button"
+            @click="openKoFi"
+          >
+            ❤️ Support this Project
+          </button>
+          <p class="setting-hint">
+            If you enjoy using Logbook+, consider supporting the project on Ko-fi!
           </p>
         </div>
       </div>
@@ -582,5 +604,30 @@ const installUpdate = async () => {
 .setting-hint.update-available {
   color: var(--color-accent);
   font-weight: 500;
+}
+
+.support-button {
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #ff6b9d 0%, #ff9a9e 100%);
+  color: white;
+  border: none;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.support-button:hover {
+  background: linear-gradient(135deg, #ff5b8d 0%, #ff8a8e 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+}
+
+.support-button:active {
+  transform: translateY(0);
 }
 </style>
