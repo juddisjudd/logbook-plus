@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import LootFocuser from "./trackers/LootFocuser.vue";
 import QuestTracker from "./trackers/QuestTracker.vue";
 import HideoutTracker from "./trackers/HideoutTracker.vue";
 import ProjectTracker from "./trackers/ProjectTracker.vue";
@@ -25,7 +26,8 @@ const toggleExpanded = () => {
     </div>
 
     <div v-if="isExpanded" class="section-content">
-      <QuestTracker v-if="id === 'quests'" />
+      <LootFocuser v-if="id === 'loot-focuser'" />
+      <QuestTracker v-else-if="id === 'quests'" />
       <HideoutTracker v-else-if="id === 'hideout'" />
       <ProjectTracker v-else-if="id === 'projects'" />
       <Suspense v-else-if="id === 'blueprints'">

@@ -18,6 +18,7 @@ const appVersion = import.meta.env.PACKAGE_VERSION || "0.1.0";
 useOpacity();
 
 const trackers = [
+  { id: "loot-focuser", title: "LOOT FOCUSER" },
   { id: "quests", title: "QUESTS" },
   { id: "hideout", title: "HIDEOUT" },
   { id: "projects", title: "PROJECTS" },
