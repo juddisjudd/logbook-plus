@@ -44,3 +44,29 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: --target x86_64-pc-windows-msvc
+
+      - name: Generate latest.json for updater
+        run: |
+          $version = "${{ github.ref_name }}".substring(1)
+          $tag = "${{ github.ref_name }}"
+
+          $latestJson = @{
+              version = $version
+              notes = "Logbook+ $tag - Windows release"
+              pub_date = (Get-Date -AsUTC -Format "o")
+              platforms = @{
+                  "windows-x86_64" = @{
+                      signature = ""
+                      url = "https://github.com/juddisjudd/logbook-plus/releases/download/$tag/logbook-plus_${version}_x64-setup.msi"
+                  }
+              }
+          }
+
+          $latestJson | ConvertTo-Json | Out-File -FilePath "latest.json" -Encoding UTF8
+
+      - name: Upload latest.json to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: latest.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
