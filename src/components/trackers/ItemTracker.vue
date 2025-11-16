@@ -11,8 +11,7 @@ const hoveredItemId = ref<string | null>(null);
 const hoverPosition = ref<{ x: number; y: number }>({ x: 0, y: 0 });
 
 onMounted(() => {
-  const allItems = getAllItems();
-  console.log("ItemTracker mounted, found items:", allItems.length);
+  getAllItems();
 });
 
 const getLocalizedText = (localized?: Record<string, string>) => {
@@ -41,18 +40,23 @@ const items = computed(() => {
 });
 
 const handleMouseEnter = (itemId: string, event: MouseEvent) => {
-  console.log("Mouse enter on item:", itemId);
   hoveredItemId.value = itemId;
-  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
   hoverPosition.value = {
-    x: rect.right + 8,
-    y: rect.top
+    x: event.clientX + 10,
+    y: event.clientY + 10
   };
-  console.log("Hover card position:", hoverPosition.value);
+};
+
+const handleMouseMove = (event: MouseEvent) => {
+  if (hoveredItemId.value) {
+    hoverPosition.value = {
+      x: event.clientX + 10,
+      y: event.clientY + 10
+    };
+  }
 };
 
 const handleMouseLeave = () => {
-  console.log("Mouse leave");
   hoveredItemId.value = null;
 };
 </script>
@@ -81,6 +85,7 @@ const handleMouseLeave = () => {
         :key="item.id"
         class="item-card"
         @mouseenter="handleMouseEnter(item.id, $event)"
+        @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
       >
         <div class="item-visual">
@@ -97,7 +102,7 @@ const handleMouseLeave = () => {
       </div>
     </div>
 
-    <!-- Hover Card Portal - Teleport to body to escape overflow containers -->
+    <!-- Hover Card Portal -->
     <Teleport to="body">
       <div
         v-if="hoveredItemId"
