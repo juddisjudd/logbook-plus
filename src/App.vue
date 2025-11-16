@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
 import { useOpacity } from "./composables/useOpacity";
@@ -14,11 +14,8 @@ const showSettings = ref(false);
 const showCheatsheet = ref(false);
 const appVersion = import.meta.env.PACKAGE_VERSION || "0.1.0";
 
-const { opacity } = useOpacity();
-
-const appStyle = computed(() => ({
-  opacity: opacity.value,
-}));
+// Initialize opacity on mount
+useOpacity();
 
 const trackers = [
   { id: "quests", title: "QUESTS" },
@@ -59,7 +56,7 @@ const handleCheatsheetToggle = () => {
 </script>
 
 <template>
-  <div class="app-root" :style="appStyle">
+  <div class="app-root">
     <UpdateNotification />
     <AppHeader
       :version="appVersion"
@@ -96,7 +93,6 @@ const handleCheatsheetToggle = () => {
   width: 100%;
   height: 100%;
   background: var(--color-bg-primary);
-  transition: opacity 0.2s ease;
 }
 
 .content-container {
