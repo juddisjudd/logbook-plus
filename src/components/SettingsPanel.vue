@@ -182,7 +182,18 @@ const checkForUpdates = async () => {
     }
   } catch (error) {
     console.error("Error checking for updates:", error);
-    updateStatus.value = "Failed to check for updates";
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    // Check if it's a network error or timeout
+    if (errorMessage.toLowerCase().includes("network") || errorMessage.toLowerCase().includes("timeout")) {
+      updateStatus.value = "Network error - unable to check for updates. Please check your internet connection.";
+    } else if (errorMessage.toLowerCase().includes("no update")) {
+      updateStatus.value = "You're on the latest version!";
+      setTimeout(() => {
+        updateStatus.value = "";
+      }, 3000);
+    } else {
+      updateStatus.value = "Unable to check for updates at this time. Please try again later.";
+    }
   } finally {
     isCheckingForUpdates.value = false;
   }
