@@ -278,6 +278,17 @@ const getLocalizedText = (record: Record<string, string> | undefined): string =>
   font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+/* Hide number input spinners */
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.quantity-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 .quantity-input:focus {
   outline: none;
   border-color: var(--color-accent);
