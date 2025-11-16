@@ -1,5 +1,5 @@
 import { ref, watch } from "vue";
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { invoke } from "@tauri-apps/api/core";
 import { loadFromStorage, saveToStorage } from "../utils/storage";
 
 const opacity = ref<number>(1);
@@ -9,11 +9,11 @@ export function useOpacity() {
   const savedOpacity = loadFromStorage<number>("app_opacity", 1);
   opacity.value = savedOpacity;
 
-  // Apply saved opacity to window on mount
+  // Apply saved opacity to window
   const applyOpacity = async (value: number) => {
     try {
-      const window = getCurrentWindow();
-      await (window as any).setOpacity?.(value);
+      await invoke<void>("set_window_opacity", { opacity: value });
+      console.log(`Window opacity set to ${Math.round(value * 100)}%`);
     } catch (error) {
       console.error("Failed to set window opacity:", error);
     }

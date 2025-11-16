@@ -16,6 +16,42 @@ pub struct AppState {
 }
 
 #[tauri::command]
+fn set_window_opacity(app_handle: tauri::AppHandle, opacity: f64) -> Result<(), String> {
+    let opacity = opacity.max(0.1).min(1.0);
+
+    #[cfg(target_os = "windows")]
+    {
+        use winapi::um::winuser::{GetWindowLongPtrA, SetWindowLongPtrA, GWL_EXSTYLE, WS_EX_LAYERED, SetLayeredWindowAttributes, LWA_ALPHA};
+        use winapi::shared::windef::HWND;
+
+        if let Some(window) = app_handle.get_webview_window("main") {
+            if let Ok(hwnd_value) = window.hwnd() {
+                let hwnd = hwnd_value.0 as HWND;
+
+                unsafe {
+                    // Set the window as layered
+                    let ex_style = GetWindowLongPtrA(hwnd, GWL_EXSTYLE);
+                    SetWindowLongPtrA(hwnd, GWL_EXSTYLE, ex_style | WS_EX_LAYERED as isize);
+
+                    // Set the opacity
+                    let alpha = (opacity * 255.0) as u8;
+                    SetLayeredWindowAttributes(hwnd, 0, alpha, LWA_ALPHA);
+                }
+
+                return Ok(());
+            }
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        eprintln!("Window opacity setting is not fully supported on this platform");
+    }
+
+    Err("Failed to set window opacity".to_string())
+}
+
+#[tauri::command]
 fn register_hotkey(hotkey: String, state: tauri::State<AppState>) -> HotkeyResult {
     // Validate format (allow single keys like F10, or combinations with +)
     if hotkey.is_empty() {
@@ -175,7 +211,7 @@ pub fn run() {
         .manage(AppState {
             current_hotkey: Mutex::new("F10".to_string()),
         })
-        .invoke_handler(tauri::generate_handler![register_hotkey, get_hotkey, init_hotkey, toggle_window_visibility, check_for_updates, install_update])
+        .invoke_handler(tauri::generate_handler![set_window_opacity, register_hotkey, get_hotkey, init_hotkey, toggle_window_visibility, check_for_updates, install_update])
         .setup(|app| {
             // Register the default hotkey with proper handler for window toggle
             let default_hotkey = "F10";
