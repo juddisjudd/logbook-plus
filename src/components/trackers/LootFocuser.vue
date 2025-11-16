@@ -144,9 +144,8 @@ const getLocalizedText = (record: Record<string, string> | undefined): string =>
   display: flex;
   flex-direction: column;
   gap: 16px;
-  height: 100%;
-  overflow-y: auto;
   padding: 12px;
+  width: 100%;
 }
 
 .focused-section {
@@ -296,6 +295,7 @@ const getLocalizedText = (record: Record<string, string> | undefined): string =>
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-height: 0;
 }
 
 .search-header {
@@ -343,6 +343,8 @@ const getLocalizedText = (record: Record<string, string> | undefined): string =>
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
   gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 .item-card {
