@@ -50,6 +50,17 @@ jobs:
           $version = "${{ github.ref_name }}".substring(1)
           $tag = "${{ github.ref_name }}"
 
+          # Find the MSI file that was created
+          $msiFile = Get-ChildItem -Path "src-tauri\target\x86_64-pc-windows-msvc\release\bundle\msi" -Filter "*.msi" | Select-Object -First 1
+
+          if ($null -eq $msiFile) {
+            Write-Error "No MSI file found in bundle directory"
+            exit 1
+          }
+
+          $msiFileName = $msiFile.Name
+          Write-Host "Found MSI file: $msiFileName"
+
           $latestJson = @{
               version = $version
               notes = "Logbook+ $tag - Windows release"
@@ -57,12 +68,14 @@ jobs:
               platforms = @{
                   "windows-x86_64" = @{
                       signature = ""
-                      url = "https://github.com/juddisjudd/logbook-plus/releases/download/$tag/logbook-plus_${version}_x64-setup.msi"
+                      url = "https://github.com/juddisjudd/logbook-plus/releases/download/$tag/$msiFileName"
                   }
               }
           }
 
           $latestJson | ConvertTo-Json | Out-File -FilePath "latest.json" -Encoding UTF8
+          Write-Host "latest.json content:"
+          Get-Content latest.json
 
       - name: Upload latest.json to release
         uses: softprops/action-gh-release@v1
