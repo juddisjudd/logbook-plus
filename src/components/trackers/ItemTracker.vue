@@ -41,15 +41,18 @@ const items = computed(() => {
 });
 
 const handleMouseEnter = (itemId: string, event: MouseEvent) => {
+  console.log("Mouse enter on item:", itemId);
   hoveredItemId.value = itemId;
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
   hoverPosition.value = {
     x: rect.right + 8,
     y: rect.top
   };
+  console.log("Hover card position:", hoverPosition.value);
 };
 
 const handleMouseLeave = () => {
+  console.log("Mouse leave");
   hoveredItemId.value = null;
 };
 </script>
@@ -99,11 +102,10 @@ const handleMouseLeave = () => {
       v-if="hoveredItemId"
       class="hover-card-container"
       :style="{
-        position: 'fixed',
+        position: 'absolute',
         left: hoverPosition.x + 'px',
         top: hoverPosition.y + 'px',
-        pointerEvents: 'none',
-        zIndex: 1000
+        pointerEvents: 'none'
       }"
     >
       <ItemHoverCard :item="items.find(i => i.id === hoveredItemId)!" />
@@ -118,6 +120,7 @@ const handleMouseLeave = () => {
   height: 100%;
   gap: 0;
   overflow: hidden;
+  position: relative;
 }
 
 .item-controls {
@@ -229,5 +232,9 @@ const handleMouseLeave = () => {
   .item-description {
     font-size: 9px;
   }
+}
+
+.hover-card-container {
+  z-index: 10000;
 }
 </style>
