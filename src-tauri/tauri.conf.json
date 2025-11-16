@@ -29,7 +29,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://releases.githubusercontent.com/repos/juddisjudd/logbook-plus/releases/latest/download/latest.json"
+        "https://github.com/juddisjudd/logbook-plus/releases/latest/download/latest.json"
       ],
       "dialog": true,
       "pubkey": ""

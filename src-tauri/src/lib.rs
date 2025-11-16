@@ -174,9 +174,18 @@ async fn check_for_updates(app_handle: tauri::AppHandle) -> Result<bool, String>
     let updater = app_handle.updater()
         .map_err(|e| format!("Failed to initialize updater: {}", e))?;
     match updater.check().await {
-        Ok(Some(_update)) => Ok(true),
-        Ok(None) => Ok(false),
-        Err(e) => Err(format!("Failed to check for updates: {}", e)),
+        Ok(Some(_update)) => {
+            println!("Update available");
+            Ok(true)
+        },
+        Ok(None) => {
+            println!("No update available - app is on latest version");
+            Ok(false)
+        },
+        Err(e) => {
+            eprintln!("Updater error: {}", e);
+            Err(format!("Failed to check for updates: {}", e))
+        },
     }
 }
 
