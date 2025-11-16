@@ -7,6 +7,10 @@ export interface LocalizedString {
   [key: string]: string;
 }
 
+export interface Effect {
+  [key: string]: string | object;
+}
+
 export interface Item {
   id: string;
   name: LocalizedString;
@@ -15,8 +19,12 @@ export interface Item {
   value: number;
   weightKg: number;
   rarity: string;
+  stackSize?: number;
   imageFilename: string;
   updatedAt: string;
+  effects?: Record<string, Effect | string>;
+  recyclesInto?: Record<string, number>;
+  foundIn?: string;
 }
 
 export interface ItemTracker {

@@ -2,10 +2,13 @@
 import { computed, onMounted, ref } from "vue";
 import SearchInput from "../SearchInput.vue";
 import ItemImage from "../ItemImage.vue";
+import ItemHoverCard from "../ItemHoverCard.vue";
 import { useItems } from "../../composables/useItems";
 
 const { getAllItems, getItemTracker, toggleItemCollection } = useItems();
 const searchQuery = ref("");
+const hoveredItemId = ref<string | null>(null);
+const hoverPosition = ref<{ x: number; y: number }>({ x: 0, y: 0 });
 
 onMounted(() => {
   const allItems = getAllItems();
@@ -44,6 +47,19 @@ const collectedCount = computed(() => {
 const handleToggleCollection = (itemId: string) => {
   toggleItemCollection(itemId);
 };
+
+const handleMouseEnter = (itemId: string, event: MouseEvent) => {
+  hoveredItemId.value = itemId;
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+  hoverPosition.value = {
+    x: rect.right + 8,
+    y: rect.top
+  };
+};
+
+const handleMouseLeave = () => {
+  hoveredItemId.value = null;
+};
 </script>
 
 <template>
@@ -74,6 +90,8 @@ const handleToggleCollection = (itemId: string) => {
         :key="item.id"
         class="item-card"
         :class="{ collected: getItemTracker(item.id).isCollected }"
+        @mouseenter="handleMouseEnter(item.id, $event)"
+        @mouseleave="handleMouseLeave"
       >
         <div class="item-visual">
           <ItemImage
@@ -93,6 +111,21 @@ const handleToggleCollection = (itemId: string) => {
         >
           {{ getItemTracker(item.id).isCollected ? "✓" : "○" }}
         </button>
+      </div>
+
+      <!-- Hover Card Portal -->
+      <div
+        v-if="hoveredItemId"
+        class="hover-card-container"
+        :style="{
+          position: 'fixed',
+          left: hoverPosition.x + 'px',
+          top: hoverPosition.y + 'px',
+          pointerEvents: 'none',
+          zIndex: 1000
+        }"
+      >
+        <ItemHoverCard :item="items.find(i => i.id === hoveredItemId)!" />
       </div>
     </div>
   </div>
