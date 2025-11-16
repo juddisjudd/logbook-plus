@@ -11,6 +11,9 @@ let capturedHotkey = "";
 
 const { opacity } = useOpacity();
 
+const isCheckingForUpdates = ref(false);
+const updateStatus = ref("");
+
 onMounted(async () => {
   // Load the current hotkey from localStorage or use default
   const saved = localStorage.getItem("hotkey");
@@ -161,6 +164,39 @@ const resetToDefault = async () => {
     hotkeyStatus.value = "Error resetting hotkey";
   }
 };
+
+const checkForUpdates = async () => {
+  isCheckingForUpdates.value = true;
+  updateStatus.value = "Checking for updates...";
+
+  try {
+    const hasUpdate = await invoke<boolean>("check_for_updates");
+
+    if (hasUpdate) {
+      updateStatus.value = "Update available! Click 'Install Update' to download and install.";
+    } else {
+      updateStatus.value = "You're on the latest version!";
+      setTimeout(() => {
+        updateStatus.value = "";
+      }, 3000);
+    }
+  } catch (error) {
+    console.error("Error checking for updates:", error);
+    updateStatus.value = "Failed to check for updates";
+  } finally {
+    isCheckingForUpdates.value = false;
+  }
+};
+
+const installUpdate = async () => {
+  try {
+    updateStatus.value = "Downloading and installing update...";
+    await invoke<void>("install_update");
+  } catch (error) {
+    console.error("Error installing update:", error);
+    updateStatus.value = `Error: ${error}`;
+  }
+};
 </script>
 
 <template>
@@ -222,6 +258,29 @@ const resetToDefault = async () => {
           </div>
           <p class="setting-hint">
             Adjust the transparency of the entire application window.
+          </p>
+        </div>
+
+        <div class="setting-item">
+          <label class="setting-label">Updates</label>
+          <div class="update-control">
+            <button
+              class="check-update-btn"
+              :disabled="isCheckingForUpdates"
+              @click="checkForUpdates"
+            >
+              {{ isCheckingForUpdates ? "Checking..." : "Check for Updates" }}
+            </button>
+            <button
+              v-if="updateStatus.includes('Update available')"
+              class="install-update-btn"
+              @click="installUpdate"
+            >
+              Install Update
+            </button>
+          </div>
+          <p v-if="updateStatus" class="setting-hint" :class="{ 'update-available': updateStatus.includes('available') }">
+            {{ updateStatus }}
           </p>
         </div>
       </div>
@@ -468,5 +527,49 @@ const resetToDefault = async () => {
   font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   min-width: 35px;
   text-align: right;
+}
+
+.update-control {
+  display: flex;
+  gap: 6px;
+}
+
+.check-update-btn,
+.install-update-btn {
+  padding: 8px 12px;
+  background: var(--color-accent);
+  color: var(--color-bg-primary);
+  border: none;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: "Barlow", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 1;
+}
+
+.check-update-btn:hover:not(:disabled) {
+  background: var(--color-accent-dark);
+}
+
+.check-update-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.install-update-btn {
+  background: #4caf50;
+}
+
+.install-update-btn:hover {
+  background: #45a049;
+}
+
+.setting-hint.update-available {
+  color: var(--color-accent);
+  font-weight: 500;
 }
 </style>
