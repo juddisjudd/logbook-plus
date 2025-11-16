@@ -3,6 +3,8 @@
 A lightweight overlay application for <a href="https://www.arcraiders.com/">Arc Raiders</a>.<br> Track quests, hideout progression, projects, and blueprints in a more convenient way.
 </div>
 
+![PioneerGame_96N8jm0gpS](https://github.com/user-attachments/assets/86555653-ed61-46f4-b87c-75936531b33d)
+
 ## Features
 
 - **Quest Tracker** - Search and track quests by name, mark objectives as complete
