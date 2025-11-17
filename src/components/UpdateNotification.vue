@@ -7,9 +7,15 @@ const isInstalling = ref(false);
 const checkIntervalId = ref<number | null>(null);
 
 const checkForUpdates = async () => {
-  // Updater plugin has been disabled - updates will be available in a future release
-  // when code signing is properly configured
-  showUpdate.value = false;
+  try {
+    const hasUpdate = await invoke<boolean>("check_for_updates");
+    showUpdate.value = hasUpdate;
+  } catch (error) {
+    // Silently fail in dev mode - updater endpoint may not be available
+    if (import.meta.env.PROD) {
+      console.error("Failed to check for updates:", error);
+    }
+  }
 };
 
 const installUpdate = async () => {

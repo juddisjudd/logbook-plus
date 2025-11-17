@@ -166,14 +166,47 @@ const resetToDefault = async () => {
 };
 
 const checkForUpdates = async () => {
-  updateStatus.value = "Update functionality is currently disabled. Redownload the installer to get the latest version.";
-  setTimeout(() => {
-    updateStatus.value = "";
-  }, 5000);
+  isCheckingForUpdates.value = true;
+  updateStatus.value = "Checking for updates...";
+
+  try {
+    const hasUpdate = await invoke<boolean>("check_for_updates");
+
+    if (hasUpdate) {
+      updateStatus.value = "Update available! Click 'Install Update' to download and install.";
+    } else {
+      updateStatus.value = "You're on the latest version!";
+      setTimeout(() => {
+        updateStatus.value = "";
+      }, 3000);
+    }
+  } catch (error) {
+    console.error("Error checking for updates:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    // Check if it's a network error or timeout
+    if (errorMessage.toLowerCase().includes("network") || errorMessage.toLowerCase().includes("timeout")) {
+      updateStatus.value = "Network error - unable to check for updates. Please check your internet connection.";
+    } else if (errorMessage.toLowerCase().includes("no update")) {
+      updateStatus.value = "You're on the latest version!";
+      setTimeout(() => {
+        updateStatus.value = "";
+      }, 3000);
+    } else {
+      updateStatus.value = "Unable to check for updates at this time. Please try again later.";
+    }
+  } finally {
+    isCheckingForUpdates.value = false;
+  }
 };
 
 const installUpdate = async () => {
-  // Update functionality disabled - see checkForUpdates() above
+  try {
+    updateStatus.value = "Downloading and installing update...";
+    await invoke<void>("install_update");
+  } catch (error) {
+    console.error("Error installing update:", error);
+    updateStatus.value = `Error: ${error}`;
+  }
 };
 
 const openKoFi = async () => {

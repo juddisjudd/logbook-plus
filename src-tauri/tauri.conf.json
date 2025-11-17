@@ -27,7 +27,12 @@
   },
   "plugins": {
     "updater": {
-      "active": false
+      "active": true,
+      "endpoints": [
+        "https://github.com/juddisjudd/logbook-plus/releases/latest/download/latest.json"
+      ],
+      "dialog": true,
+      "pubkey": ""
     }
   },
   "bundle": {
