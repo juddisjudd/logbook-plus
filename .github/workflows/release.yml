@@ -67,7 +67,6 @@ jobs:
               pub_date = (Get-Date -AsUTC -Format "o")
               platforms = @{
                   "windows-x86_64" = @{
-                      signature = ""
                       url = "https://github.com/juddisjudd/logbook-plus/releases/download/$tag/$msiFileName"
                   }
               }
