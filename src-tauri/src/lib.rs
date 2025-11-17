@@ -216,11 +216,11 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .plugin(tauri_plugin_updater::Builder::new().build())
+        // .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(AppState {
             current_hotkey: Mutex::new("F10".to_string()),
         })
-        .invoke_handler(tauri::generate_handler![set_window_opacity, register_hotkey, get_hotkey, init_hotkey, toggle_window_visibility, check_for_updates, install_update])
+        .invoke_handler(tauri::generate_handler![set_window_opacity, register_hotkey, get_hotkey, init_hotkey, toggle_window_visibility])
         .setup(|app| {
             // Register the default hotkey with proper handler for window toggle
             let default_hotkey = "F10";
