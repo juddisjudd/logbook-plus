@@ -31,7 +31,8 @@
       "endpoints": [
         "https://github.com/juddisjudd/logbook-plus/releases/latest/download/latest.json"
       ],
-      "dialog": true
+      "dialog": true,
+      "pubkey": ""
     }
   },
   "bundle": {
