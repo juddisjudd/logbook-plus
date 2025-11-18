@@ -1,5 +1,4 @@
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
-use tauri_plugin_updater::UpdaterExt;
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::{Manager, Emitter};
 use std::sync::Mutex;
@@ -166,48 +165,6 @@ fn init_hotkey(hotkey: String, app: tauri::AppHandle) -> HotkeyResult {
             success: false,
             message: format!("Invalid hotkey format: '{}'. Use F10, ctrl+shift+l, etc.", hotkey),
         },
-    }
-}
-
-#[tauri::command]
-async fn check_for_updates(app_handle: tauri::AppHandle) -> Result<bool, String> {
-    let updater = app_handle.updater()
-        .map_err(|e| format!("Failed to initialize updater: {}", e))?;
-    match updater.check().await {
-        Ok(Some(_update)) => {
-            println!("Update available");
-            Ok(true)
-        },
-        Ok(None) => {
-            println!("No update available - app is on latest version");
-            Ok(false)
-        },
-        Err(e) => {
-            eprintln!("Updater error: {}", e);
-            Err(format!("Failed to check for updates: {}", e))
-        },
-    }
-}
-
-#[tauri::command]
-async fn install_update(app_handle: tauri::AppHandle) -> Result<(), String> {
-    let updater = app_handle.updater()
-        .map_err(|e| format!("Failed to initialize updater: {}", e))?;
-    match updater.check().await {
-        Ok(Some(update)) => {
-            // Download and install with empty callbacks (no progress tracking)
-            update.download_and_install(
-                |_, _| {},  // on_chunk: (bytes_read, total_bytes)
-                || {},      // on_download_finish
-            ).await
-                .map_err(|e| format!("Failed to install update: {}", e))?;
-            app_handle.restart();
-            // Note: restart() terminates the process, this line is unreachable
-            #[allow(unreachable_code)]
-            Ok(())
-        }
-        Ok(None) => Err("No update available".to_string()),
-        Err(e) => Err(format!("Failed to check for updates: {}", e)),
     }
 }
 
