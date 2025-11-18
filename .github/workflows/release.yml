@@ -37,8 +37,6 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Logbook+ ${{ github.ref_name }}'
@@ -61,18 +59,7 @@ jobs:
           }
 
           $msiFileName = $msiFile.Name
-          $msiPath = $msiFile.FullName
           Write-Host "Found MSI file: $msiFileName"
-
-          # Read the signature file that was created by Tauri
-          $sigFile = "$msiPath.sig"
-          if (Test-Path $sigFile) {
-            $signature = Get-Content $sigFile -Raw
-            Write-Host "Signature file found and read successfully"
-          } else {
-            Write-Error "Signature file not found at $sigFile"
-            exit 1
-          }
 
           $latestJson = @{
               version = $version
@@ -80,7 +67,6 @@ jobs:
               pub_date = (Get-Date -AsUTC -Format "o")
               platforms = @{
                   "windows-x86_64" = @{
-                      signature = $signature
                       url = "https://github.com/juddisjudd/logbook-plus/releases/download/$tag/$msiFileName"
                   }
               }
