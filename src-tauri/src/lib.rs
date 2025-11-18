@@ -168,6 +168,43 @@ fn init_hotkey(hotkey: String, app: tauri::AppHandle) -> HotkeyResult {
     }
 }
 
+#[tauri::command]
+async fn check_latest_version() -> Result<Option<String>, String> {
+    // Fetch the latest release information from GitHub API
+    let client = reqwest::Client::new();
+    let response = client
+        .get("https://api.github.com/repos/juddisjudd/logbook-plus/releases/latest")
+        .header("User-Agent", "logbook-plus")
+        .send()
+        .await
+        .map_err(|e| format!("Failed to fetch latest release: {}", e))?;
+
+    if !response.status().is_success() {
+        return Err(format!("GitHub API error: {}", response.status()));
+    }
+
+    let release: serde_json::Value = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse release data: {}", e))?;
+
+    let latest_version = release
+        .get("tag_name")
+        .and_then(|v| v.as_str())
+        .map(|v| v.trim_start_matches('v').to_string())
+        .ok_or_else(|| "Could not find version in release data".to_string())?;
+
+    // Get the current app version from Cargo.toml
+    let current_version = env!("CARGO_PKG_VERSION");
+
+    // Simple version comparison: if latest is different from current, return it
+    if latest_version != current_version {
+        Ok(Some(latest_version))
+    } else {
+        Ok(None)
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -176,7 +213,7 @@ pub fn run() {
         .manage(AppState {
             current_hotkey: Mutex::new("F10".to_string()),
         })
-        .invoke_handler(tauri::generate_handler![set_window_opacity, register_hotkey, get_hotkey, init_hotkey, toggle_window_visibility])
+        .invoke_handler(tauri::generate_handler![set_window_opacity, register_hotkey, get_hotkey, init_hotkey, toggle_window_visibility, check_latest_version])
         .setup(|app| {
             // Register the default hotkey with proper handler for window toggle
             let default_hotkey = "F10";

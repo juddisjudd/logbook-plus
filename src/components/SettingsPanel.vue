@@ -8,6 +8,8 @@ const hotkeyStatus = ref("");
 const isCapturing = ref(false);
 const isSaving = ref(false);
 let capturedHotkey = "";
+const isCheckingVersion = ref(false);
+const latestVersion = ref<string | null>(null);
 
 const { opacity } = useOpacity();
 
@@ -163,6 +165,23 @@ const resetToDefault = async () => {
 };
 
 const checkForUpdates = async () => {
+  isCheckingVersion.value = true;
+  try {
+    const newVersion = await invoke<string | null>("check_latest_version");
+    if (newVersion) {
+      latestVersion.value = newVersion;
+    } else {
+      latestVersion.value = null;
+    }
+  } catch (error) {
+    console.error("Error checking version:", error);
+    latestVersion.value = null;
+  } finally {
+    isCheckingVersion.value = false;
+  }
+};
+
+const openReleases = async () => {
   const { openUrl } = await import("@tauri-apps/plugin-opener");
   await openUrl("https://github.com/juddisjudd/logbook-plus/releases");
 };
@@ -241,14 +260,30 @@ const openKoFi = async () => {
 
         <div class="setting-item">
           <label class="setting-label">Updates</label>
-          <button
-            class="check-update-btn"
-            @click="checkForUpdates"
-          >
-            View Latest Release
-          </button>
-          <p class="setting-hint">
-            Open the GitHub releases page to download the latest version of Logbook+.
+          <div class="update-control">
+            <button
+              class="check-update-btn"
+              :disabled="isCheckingVersion"
+              @click="checkForUpdates"
+            >
+              {{ isCheckingVersion ? "Checking..." : "Check for Updates" }}
+            </button>
+            <button
+              v-if="latestVersion"
+              class="install-update-btn"
+              @click="openReleases"
+            >
+              Download v{{ latestVersion }}
+            </button>
+          </div>
+          <p v-if="latestVersion" class="setting-hint update-available">
+            ✓ Version {{ latestVersion }} is available! Click the button to download.
+          </p>
+          <p v-else-if="!isCheckingVersion && latestVersion === false" class="setting-hint">
+            You're on the latest version!
+          </p>
+          <p v-else class="setting-hint">
+            Click to check for the latest version of Logbook+.
           </p>
         </div>
 
