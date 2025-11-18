@@ -29,7 +29,7 @@
   "bundle": {
     "active": true,
     "targets": ["msi"],
-    "createUpdaterArtifacts": true,
+    "createUpdaterArtifacts": false,
     "icon": [
       "../src/assets/32x32.png",
       "../src/assets/128x128.png",
