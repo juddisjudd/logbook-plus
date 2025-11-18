@@ -10,6 +10,7 @@ const isSaving = ref(false);
 let capturedHotkey = "";
 const isCheckingVersion = ref(false);
 const latestVersion = ref<string | null>(null);
+const hasCheckedVersion = ref(false);
 
 const { opacity } = useOpacity();
 
@@ -168,14 +169,12 @@ const checkForUpdates = async () => {
   isCheckingVersion.value = true;
   try {
     const newVersion = await invoke<string | null>("check_latest_version");
-    if (newVersion) {
-      latestVersion.value = newVersion;
-    } else {
-      latestVersion.value = null;
-    }
+    latestVersion.value = newVersion;
+    hasCheckedVersion.value = true;
   } catch (error) {
     console.error("Error checking version:", error);
     latestVersion.value = null;
+    hasCheckedVersion.value = true;
   } finally {
     isCheckingVersion.value = false;
   }
@@ -279,7 +278,7 @@ const openKoFi = async () => {
           <p v-if="latestVersion" class="setting-hint update-available">
             ✓ Version {{ latestVersion }} is available! Click the button to download.
           </p>
-          <p v-else-if="!isCheckingVersion && latestVersion === false" class="setting-hint">
+          <p v-else-if="hasCheckedVersion && !latestVersion" class="setting-hint">
             You're on the latest version!
           </p>
           <p v-else class="setting-hint">
