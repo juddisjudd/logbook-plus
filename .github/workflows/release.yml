@@ -45,6 +45,14 @@ jobs:
           prerelease: false
           args: --target x86_64-pc-windows-msvc
 
+      - name: Setup signing key
+        run: |
+          # Write the private key to a file for the signer to use
+          $privateKey = "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}"
+          $privateKey | Out-File -FilePath "private_key.pem" -Encoding UTF8
+          Write-Host "Private key file created"
+        shell: powershell
+
       - name: Generate latest.json for updater
         run: |
           $version = "${{ github.ref_name }}".substring(1)
@@ -92,7 +100,7 @@ jobs:
           Write-Host "latest.json content:"
           Get-Content latest.json
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY: "private_key.pem"
 
       - name: Upload latest.json to release
         uses: softprops/action-gh-release@v1
