@@ -11,9 +11,6 @@ let capturedHotkey = "";
 
 const { opacity } = useOpacity();
 
-const isCheckingForUpdates = ref(false);
-const updateStatus = ref("");
-
 onMounted(async () => {
   // Load the current hotkey from localStorage or use default
   const saved = localStorage.getItem("hotkey");
@@ -166,47 +163,8 @@ const resetToDefault = async () => {
 };
 
 const checkForUpdates = async () => {
-  isCheckingForUpdates.value = true;
-  updateStatus.value = "Checking for updates...";
-
-  try {
-    const hasUpdate = await invoke<boolean>("check_for_updates");
-
-    if (hasUpdate) {
-      updateStatus.value = "Update available! Click 'Install Update' to download and install.";
-    } else {
-      updateStatus.value = "You're on the latest version!";
-      setTimeout(() => {
-        updateStatus.value = "";
-      }, 3000);
-    }
-  } catch (error) {
-    console.error("Error checking for updates:", error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    // Check if it's a network error or timeout
-    if (errorMessage.toLowerCase().includes("network") || errorMessage.toLowerCase().includes("timeout")) {
-      updateStatus.value = "Network error - unable to check for updates. Please check your internet connection.";
-    } else if (errorMessage.toLowerCase().includes("no update")) {
-      updateStatus.value = "You're on the latest version!";
-      setTimeout(() => {
-        updateStatus.value = "";
-      }, 3000);
-    } else {
-      updateStatus.value = "Unable to check for updates at this time. Please try again later.";
-    }
-  } finally {
-    isCheckingForUpdates.value = false;
-  }
-};
-
-const installUpdate = async () => {
-  try {
-    updateStatus.value = "Downloading and installing update...";
-    await invoke<void>("install_update");
-  } catch (error) {
-    console.error("Error installing update:", error);
-    updateStatus.value = `Error: ${error}`;
-  }
+  const { openUrl } = await import("@tauri-apps/plugin-opener");
+  await openUrl("https://github.com/juddisjudd/logbook-plus/releases");
 };
 
 const openKoFi = async () => {
@@ -283,24 +241,14 @@ const openKoFi = async () => {
 
         <div class="setting-item">
           <label class="setting-label">Updates</label>
-          <div class="update-control">
-            <button
-              class="check-update-btn"
-              :disabled="isCheckingForUpdates"
-              @click="checkForUpdates"
-            >
-              {{ isCheckingForUpdates ? "Checking..." : "Check for Updates" }}
-            </button>
-            <button
-              v-if="updateStatus.includes('Update available')"
-              class="install-update-btn"
-              @click="installUpdate"
-            >
-              Install Update
-            </button>
-          </div>
-          <p v-if="updateStatus" class="setting-hint" :class="{ 'update-available': updateStatus.includes('available') }">
-            {{ updateStatus }}
+          <button
+            class="check-update-btn"
+            @click="checkForUpdates"
+          >
+            View Latest Release
+          </button>
+          <p class="setting-hint">
+            Open the GitHub releases page to download the latest version of Logbook+.
           </p>
         </div>
 
