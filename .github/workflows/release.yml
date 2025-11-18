@@ -59,7 +59,22 @@ jobs:
           }
 
           $msiFileName = $msiFile.Name
+          $msiPath = $msiFile.FullName
           Write-Host "Found MSI file: $msiFileName"
+
+          # Sign the MSI file
+          Write-Host "Signing MSI file..."
+          bun run tauri signer sign "$msiPath"
+
+          # Read the signature from the .sig file
+          $sigFile = "$msiPath.sig"
+          if (Test-Path $sigFile) {
+            $signature = Get-Content $sigFile -Raw
+            Write-Host "Signature generated: $($signature.substring(0, 50))..."
+          } else {
+            Write-Error "Signature file not found at $sigFile"
+            exit 1
+          }
 
           $latestJson = @{
               version = $version
@@ -67,6 +82,7 @@ jobs:
               pub_date = (Get-Date -AsUTC -Format "o")
               platforms = @{
                   "windows-x86_64" = @{
+                      signature = $signature
                       url = "https://github.com/juddisjudd/logbook-plus/releases/download/$tag/$msiFileName"
                   }
               }
@@ -75,6 +91,8 @@ jobs:
           $latestJson | ConvertTo-Json | Out-File -FilePath "latest.json" -Encoding UTF8
           Write-Host "latest.json content:"
           Get-Content latest.json
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
 
       - name: Upload latest.json to release
         uses: softprops/action-gh-release@v1
