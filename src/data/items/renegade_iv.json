@@ -15,7 +15,7 @@
     "no": "Renegade IV",
     "ja": "レネゲード IV",
     "fr": "Renégat IV",
-    "es": "Renegade IV",
+    "es": "Renegado IV",
     "hr": "Renegade IV",
     "pt": "Renegade IV",
     "da": "Renegade IV"
@@ -170,7 +170,7 @@
     }
   },
   "value": 17000,
-  "weightKg": 10.0,
+  "weightKg": 10,
   "upgradeCost": {
     "advanced_mechanical_components": 2,
     "medium_gun_parts": 2

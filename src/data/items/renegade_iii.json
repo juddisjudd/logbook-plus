@@ -15,7 +15,7 @@
     "no": "Renegade III",
     "ja": "レネゲード III",
     "fr": "Renégat III",
-    "es": "Renegade III",
+    "es": "Renegado III",
     "hr": "Renegade III",
     "pt": "Renegade III",
     "da": "Renegade III"
@@ -170,7 +170,7 @@
     }
   },
   "value": 13000,
-  "weightKg": 10.0,
+  "weightKg": 10,
   "upgradeCost": {
     "advanced_mechanical_components": 1,
     "medium_gun_parts": 2

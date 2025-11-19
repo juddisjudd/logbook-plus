@@ -4,7 +4,7 @@
     "en": "Stitcher IV",
     "de": "Stitcher IV",
     "fr": "Sutureur IV",
-    "es": "Stitcher IV",
+    "es": "Costurero IV",
     "pt": "Stitcher IV",
     "pl": "Stitcher IV",
     "no": "Stitcher IV",
@@ -43,7 +43,7 @@
   "type": "Weapon",
   "rarity": "Uncommon",
   "value": 5000,
-  "weightKg": 5.0,
+  "weightKg": 5,
   "recyclesInto": {
     "mechanical_components": 2,
     "simple_gun_parts": 2

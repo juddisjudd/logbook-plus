@@ -15,7 +15,7 @@
     "no": "Renegade II",
     "ja": "レネゲード II",
     "fr": "Renégat II",
-    "es": "Renegade II",
+    "es": "Renegado II",
     "hr": "Renegade II",
     "pt": "Renegade II",
     "da": "Renegade II"
@@ -170,7 +170,7 @@
     }
   },
   "value": 10000,
-  "weightKg": 10.0,
+  "weightKg": 10,
   "upgradeCost": {
     "advanced_mechanical_components": 1,
     "medium_gun_parts": 2
